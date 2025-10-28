@@ -1,0 +1,5 @@
+{
+    "codium.codeCompletion.enable": false,
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic"
+}

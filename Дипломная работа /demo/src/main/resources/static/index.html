@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система бонусов и лояльности</title>
+    
+    <!-- Favicon чтобы убрать 404 ошибку -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>" type="image/svg+xml">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button.edit {
+            background-color: #f39c12;
+        }
+        button.edit:hover {
+            background-color: #e67e22;
+        }
+        button.delete {
+            background-color: #e74c3c;
+        }
+        button.delete:hover {
+            background-color: #c0392b;
+        }
+        button.get-data {
+            background-color: #27ae60;
+        }
+        button.get-data:hover {
+            background-color: #219a52;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .links {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .user-list {
+            margin-top: 20px;
+        }
+        .user-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .user-card.new-user {
+            background-color: #e8f5e8;
+            border-color: #4caf50;
+            animation: highlight 2s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes highlight {
+            0% { background-color: #e8f5e8; }
+            50% { background-color: #c8e6c9; }
+            100% { background-color: #e8f5e8; }
+        }
+        .user-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .user-field {
+            margin-bottom: 5px;
+        }
+        .user-field strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.9em;
+        }
+        .user-value {
+            color: #34495e;
+            font-size: 1em;
+        }
+        .user-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        .empty-state {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+        }
+        .data-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .data-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: white;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .modal-title {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .modal-actions button {
+            margin: 0;
+        }
+
+        .btn-cancel {
+            background-color: #95a5a6;
+        }
+
+        .btn-cancel:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-save {
+            background-color: #27ae60;
+        }
+
+        .btn-save:hover {
+            background-color: #219a52;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Система бонусов и лояльности</h1>
+        
+        <!-- Новая кнопка для получения данных -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button class="get-data" onclick="getBackendData()">📥 Получить данные с бекенда</button>
+        </div>
+        
+        <div id="backendData" class="data-display" style="display: none;">
+            <h3>📋 Данные от бекенда:</h3>
+            <div id="dataContent"></div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Всего пользователей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalBonuses">0</div>
+                <div class="stat-label">Всего бонусов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgBonuses">0</div>
+                <div class="stat-label">Среднее бонусов</div>
+            </div>
+        </div>
+        
+        <h2>👤 Создание нового пользователя</h2>
+        <form id="userForm">
+            <div class="form-group">
+                <label for="name">ФИО пользователя:</label>
+                <input type="text" id="name" name="name" placeholder="Введите ФИО" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="example@mail.ru" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="tel" id="phone" name="phone" placeholder="+79161234567">
+            </div>
+            
+            <div class="form-group">
+                <label for="initialBonus">Начальные бонусные баллы:</label>
+                <input type="number" id="initialBonus" name="initialBonus" value="0" min="0">
+            </div>
+            
+            <button type="submit">✅ Создать пользователя</button>
+            <button type="button" onclick="loadUsers()">🔄 Обновить список</button>
+        </form>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>📋 Список пользователей</h2>
+            <button onclick="loadUsers()">🔄 Обновить</button>
+        </div>
+        <div id="userList" class="user-list">
+            <div class="loading">Загрузка пользователей...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Таблица пользователей</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Bonus Balance</th>
+                    <th>User Group</th>
+                    <th>Name</th>
+                    <th>Bonus Points</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Username</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyGetUsersData">
+                <tr>
+                    <td colspan="10" style="text-align: center;">Данные загружаются...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Модальное окно для редактирования пользователя -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Редактировать пользователя</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="editUserName">ФИО пользователя:</label>
+                    <input type="text" id="editUserName" name="name" placeholder="Введите ФИО" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editUserEmail">Email:</label>
+                    <input type="email" id="editUserEmail" name="email" placeholder="example@mail.ru" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editUserPhone">Телефон:</label>
+                    <input type="tel" id="editUserPhone" name="phone" placeholder="+79161234567">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editUserBonusPoints">Бонусные баллы:</label>
+                    <input type="number" id="editUserBonusPoints" name="bonusPoints" value="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="editUserGroup">Группа пользователя:</label>
+                    <select id="editUserGroup" name="userGroup">
+                        <option value="">Выберите группу</option>
+                        <option value="NEW">NEW - Новый пользователь</option>
+                        <option value="REGULAR">REGULAR - Постоянный клиент</option>
+                        <option value="VIP">VIP - VIP клиент</option>
+                        <option value="PREMIUM">PREMIUM - Премиум клиент</option>
+                        <option value="CORPORATE">CORPORATE - Корпоративный клиент</option>
+                        <option value="TEST">TEST - Тестовый аккаунт</option>
+                        <option value="ADMIN">ADMIN - Администратор</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editUserUsername">Username:</label>
+                    <input type="text" id="editUserUsername" name="username" placeholder="Имя пользователя">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">❌ Отмена</button>
+                    <button type="submit" class="btn-save">💾 Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="links">
+            <!-- Убираем ссылки которые могут вызывать 404 -->
+            <a href="javascript:void(0)" onclick="showNotification('Swagger документация недоступна', 'error')">📚 Swagger документация</a>
+            <a href="javascript:void(0)" onclick="showNotification('База данных недоступна', 'error')">🗄️ База данных H2</a>
+            <a href="/api/users/" target="_blank">🏠 Главная страница API</a>
+            <a href="/api/users/health" target="_blank">❤️ Проверка здоровья</a>
+        </div>
+    </div>
+
+    <script>
+        // Глобальная переменная для хранения текущего списка пользователей
+        let currentUsers = [];
+        let currentEditingUserId = null;
+
+        // Загружаем пользователей при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+            // Обновляем список каждые 30 секунд
+            setInterval(loadUsers, 30000);
+
+            // Обработчик формы редактирования
+            document.getElementById('editUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveUserChanges();
+            });
+
+            // Закрытие модального окна при клике вне его
+            document.getElementById('editUserModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeEditModal();
+                }
+            });
+
+            // Закрытие модального окна по ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeEditModal();
+                }
+            });
+        });
+
+        // Функция открытия модального окна редактирования
+        function openEditModal(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (!user) {
+                showNotification('❌ Пользователь не найден', 'error');
+                return;
+            }
+
+            currentEditingUserId = userId;
+
+            // Заполняем форму данными пользователя
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUserName').value = user.name || '';
+            document.getElementById('editUserEmail').value = user.email || '';
+            document.getElementById('editUserPhone').value = user.phone || '';
+            document.getElementById('editUserBonusPoints').value = user.bonusPoints || 0;
+            document.getElementById('editUserGroup').value = user.userGroup || '';
+            document.getElementById('editUserUsername').value = user.username || '';
+
+            // Показываем модальное окно
+            document.getElementById('editUserModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Функция закрытия модального окна
+        function closeEditModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentEditingUserId = null;
+        }
+
+        // Функция сохранения изменений пользователя
+        async function saveUserChanges() {
+            if (!currentEditingUserId) return;
+
+            const formData = {
+                name: document.getElementById('editUserName').value,
+                email: document.getElementById('editUserEmail').value,
+                phone: document.getElementById('editUserPhone').value,
+                bonusPoints: parseInt(document.getElementById('editUserBonusPoints').value),
+                userGroup: document.getElementById('editUserGroup').value,
+                username: document.getElementById('editUserUsername').value
+            };
+
+            try {
+                const response = await fetch(`/api/users/update/${currentEditingUserId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('✅ ' + result.message, 'success');
+                    closeEditModal();
+                    await loadUsers();
+                } else {
+                    showNotification('❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Ошибка при обновлении пользователя: ' + error.message, 'error');
+            }
+        }
+
+        // Новая функция для получения данных с бекенда
+        async function getBackendData() {
+            try {
+                // Показываем индикатор загрузки
+                const dataDisplay = document.getElementById('backendData');
+                const dataContent = document.getElementById('dataContent');
+                dataContent.innerHTML = '<div class="loading">Загрузка данных...</div>';
+                dataDisplay.style.display = 'block';
+
+                // Получаем данные с бекенда
+                const response = await fetch('/api/users/all');
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Отображаем полученные данные
+                if (data && data.length > 0) {
+                    dataContent.innerHTML = data.map(user => `
+                        <div class="data-item">
+                            <strong>👤 ${user.name || 'Не указано'}</strong><br>
+                            📧 Email: ${user.email || 'Не указан'}<br>
+                            📞 Телефон: ${user.phone || 'Не указан'}<br>
+                            ⭐ Бонусы: ${user.bonusPoints || 0}<br>
+                            📅 Регистрация: ${user.registrationDate ? formatDate(user.registrationDate) : 'Не указана'}
+                        </div>
+                    `).join('');
+                    
+                    showNotification('✅ Данные успешно получены с бекенда!', 'success');
+                } else {
+                    dataContent.innerHTML = '<div class="empty-state">Нет данных для отображения</div>';
+                }
+                
+            } catch (error) {
+                const dataContent = document.getElementById('dataContent');
+                dataContent.innerHTML = `
+                    <div class="result error">
+                        ❌ Ошибка при получении данных: ${error.message}
+                    </div>
+                `;
+                showNotification('❌ Ошибка при получении данных', 'error');
+            }
+        }
+
+        // Обработчик формы создания пользователя
+        document.getElementById('userForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                initialBonus: parseInt(document.getElementById('initialBonus').value)
+            };
+            
+            try {
+                const response = await fetch('/api/users/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                const resultDiv = document.getElementById('result');
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ Успех!</strong><br>
+                        ${result.message}
+                    `;
+                    // Очищаем форму после успешного создания
+                    document.getElementById('userForm').reset();
+                    // Динамически обновляем список пользователей
+                    await loadUsers(true);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <strong>❌ Ошибка!</strong><br>
+                        ${result.message}
+                    `;
+                }
+                
+                resultDiv.style.display = 'block';
+                
+                // Скрываем сообщение через 5 секунд
+                setTimeout(() => {
+                    resultDiv.style.display = 'none';
+                }, 5000);
+                
+            } catch (error) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>❌ Ошибка соединения!</strong><br>
+                    Не удалось подключиться к серверу. Проверьте, запущено ли приложение.
+                `;
+                resultDiv.style.display = 'block';
+            }
+        });
+
+        // Функция загрузки списка пользователей
+        async function loadUsers(highlightNew = false) {
+            try {
+                document.getElementById('userList').innerHTML = '<div class="loading">Загрузка пользователей...</div>';
+                
+                const response = await fetch('/api/users/all');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const users = await response.json();
+                console.log('Полученные данные:', users);
+                
+                currentUsers = users;
+                updateStatistics(users);
+                renderUserList(users, highlightNew);
+                renderUserTable(users);
+                
+            } catch (error) {
+                console.error('Ошибка при загрузке пользователей:', error);
+                document.getElementById('userList').innerHTML = `
+                    <div class="result error">
+                        ❌ Ошибка при загрузке пользователей: ${error.message}
+                    </div>
+                `;
+                document.querySelector('#tbodyGetUsersData').innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center; color: #e74c3c;">
+                            ❌ Ошибка при загрузке данных: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Функция отрисовки таблицы пользователей
+        function renderUserTable(users) {
+            const tbody = document.querySelector('#tbodyGetUsersData');
+            
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center;">
+                            Нет данных для отображения
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = users.map((item) => {
+                const userId = item.userId !== undefined ? item.userId : (item.id || 'N/A');
+                const bonusBalance = item.bonusBalance !== undefined ? item.bonusBalance : (item.bonusPoints || 0);
+                const userGroup = item.userGroup || 'Не указана';
+                const name = item.name || 'Не указано';
+                const id = item.id || 'N/A';
+                const bonusPoints = item.bonusPoints || 0;
+                const email = item.email || 'Не указан';
+                const phone = item.phone || 'Не указан';
+                const username = item.username || 'Не указан';
+                const safeName = name ? name.replace(/'/g, "\\'") : '';
+                
+                return `
+                    <tr>
+                        <td>${id}</td>
+                        <td>${userId}</td>
+                        <td>${bonusBalance}</td>
+                        <td>${userGroup}</td>
+                        <td>${name}</td>
+                        <td>${bonusPoints}</td>
+                        <td>${email}</td>
+                        <td>${phone}</td>
+                        <td>${username}</td>
+                        <td>
+                            <button class="edit" onclick="openEditModal(${id})">✏️</button>
+                            <button class="delete" onclick="deleteUser(${id}, '${safeName}')">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Функция отрисовки списка пользователей
+        function renderUserList(users, highlightNew = false) {
+            const userListDiv = document.getElementById('userList');
+            
+            if (users.length === 0) {
+                userListDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>😔 Пользователи не найдены</h3>
+                        <p>Создайте первого пользователя с помощью формы выше</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            users.sort((a, b) => new Date(b.registrationDate || 0) - new Date(a.registrationDate || 0));
+            
+            userListDiv.innerHTML = users.map((user, index) => {
+                const isNew = highlightNew && index === 0;
+                
+                const userName = user.name || 'Не указано';
+                const userEmail = user.email || 'Не указан';
+                const userPhone = user.phone || 'Не указан';
+                const userBonusPoints = user.bonusPoints || 0;
+                const userId = user.id || 'N/A';
+                const userUserId = user.userId || user.id || 'N/A';
+                const userBonusBalance = user.bonusBalance || user.bonusPoints || 0;
+                const userUserGroup = user.userGroup || 'Не указана';
+                const safeName = userName ? userName.replace(/'/g, "\\'") : '';
+                
+                return `
+                    <div class="user-card ${isNew ? 'new-user' : ''}" id="user-${userId}">
+                        <div class="user-info">
+                            <div class="user-field">
+                                <strong>ID:</strong>
+                                <div class="user-value">${userId}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>User ID:</strong>
+                                <div class="user-value">${userUserId}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>Bonus Balance:</strong>
+                                <div class="user-value">${userBonusBalance}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>User Group:</strong>
+                                <div class="user-value">${userUserGroup}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>ФИО:</strong>
+                                <div class="user-value">${userName}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>Email:</strong>
+                                <div class="user-value">${userEmail}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>Телефон:</strong>
+                                <div class="user-value">${userPhone}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>Бонусы:</strong>
+                                <div class="user-value">${userBonusPoints}</div>
+                            </div>
+                            <div class="user-field">
+                                <strong>Дата регистрации:</strong>
+                                <div class="user-value">${formatDate(user.registrationDate)}</div>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="edit" onclick="openEditModal(${userId})">
+                                ✏️ Редактировать
+                            </button>
+                            <button class="delete" onclick="deleteUser(${userId}, '${safeName}')">
+                                🗑️ Удалить
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Функция обновления статистики
+        function updateStatistics(users) {
+            const totalUsers = users.length;
+            const totalBonuses = users.reduce((sum, user) => sum + (user.bonusPoints || 0), 0);
+            const avgBonuses = totalUsers > 0 ? Math.round(totalBonuses / totalUsers) : 0;
+            
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalBonuses').textContent = totalBonuses;
+            document.getElementById('avgBonuses').textContent = avgBonuses;
+        }
+
+        // Функция форматирования даты
+        function formatDate(dateString) {
+            if (!dateString) return 'Не указана';
+            const date = new Date(dateString);
+            return date.toLocaleString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Функция для удаления пользователя
+        async function deleteUser(userId, userName) {
+            const displayName = userName || 'этого пользователя';
+            if (confirm(`Вы уверены, что хотите удалить пользователя "${displayName}"?`)) {
+                try {
+                    const response = await fetch(`/api/users/delete/${userId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showNotification('✅ ' + result.message, 'success');
+                        const userCard = document.getElementById(`user-${userId}`);
+                        if (userCard) {
+                            userCard.style.opacity = '0';
+                            userCard.style.transform = 'translateX(-100%)';
+                            setTimeout(() => loadUsers(), 300);
+                        } else {
+                            await loadUsers();
+                        }
+                    } else {
+                        showNotification('❌ ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    showNotification('❌ Ошибка при удалении пользователя: ' + error.message, 'error');
+                }
+            }
+        }
+        
+        // Функция показа уведомлений
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `result ${type}`;
+            notification.innerHTML = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '1000';
+            notification.style.maxWidth = '300px';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
