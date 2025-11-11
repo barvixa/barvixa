@@ -1,4 +1,4 @@
-package com.example.demo.model;  // Добавьте эту строку!
+package com.example.demo.model;
 
 import jakarta.persistence.*;
 
@@ -9,7 +9,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String username;
     
     @Column(nullable = false, unique = true)
@@ -17,19 +17,19 @@ public class User {
     
     private String phone;
     
-    @Column(name = "bonus_points")
-    private int bonusPoints = 0;
- 
+    private Integer bonusPoints;
+    
     // Конструкторы
     public User() {}
     
-    public User(String username, String email, String phone) {
+    public User(String username, String email, String phone, Integer bonusPoints) {
         this.username = username;
         this.email = email;
         this.phone = phone;
+        this.bonusPoints = bonusPoints;
     }
     
-    // Геттеры и сеттеры
+    // геттеры и сеттеры
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
@@ -42,6 +42,6 @@ public class User {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
     
-    public int getBonusPoints() { return bonusPoints; }
-    public void setBonusPoints(int bonusPoints) { this.bonusPoints = bonusPoints; }
+    public Integer getBonusPoints() { return bonusPoints; }
+    public void setBonusPoints(Integer bonusPoints) { this.bonusPoints = bonusPoints; }
 }
