@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CreateUserRequest;
+import com.example.demo.dto.CreateUserResponse;
 import com.example.demo.dto.User;
 import com.example.demo.repository.UsersRepository;
 
@@ -161,34 +162,5 @@ public class UserService {
             request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
             request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
         );
-    }
-    public static class CreateUserResponse {
-        private boolean success;
-        private String message;
-
-        // Конструкторы
-        public CreateUserResponse() {}
-
-        public CreateUserResponse(boolean success, String message) {
-            this.success = success;
-            this.message = message;
-        }
-
-        // Геттеры и сеттеры
-        public boolean isSuccess() {
-            return success;
-        }
-
-        public void setSuccess(boolean success) {
-            this.success = success;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
 }

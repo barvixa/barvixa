@@ -19,8 +19,8 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public UserService.CreateUserResponse createUser(@RequestBody CreateUserResponse request) {
-        return userService.createUser(request);
+    public CreateUserResponse createUser(@RequestBody CreateUserResponse request) {
+        return createUser(request);
         
     }
        @GetMapping("/all")
