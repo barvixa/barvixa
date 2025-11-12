@@ -6,17 +6,23 @@ public class CreateUserResponse {
     private String email;
     private String name;
     private String phone;
-    private String InitialBonus;
+    private String initialBonus;
+    private String bonusBalance;
+    private String bonusPoints;
+    private String userGroup;
     // Конструкторы
     public CreateUserResponse() {}
 
-    public CreateUserResponse(boolean success, String message, String email, String name, String phone, String InitialBonus) {
+    public CreateUserResponse(boolean success, String message, String email, String name, String phone, String initialBonus,String bonusBalance,String bonusPoints, String userGroup ) {
         this.success = success;
         this.message = message;
         this.email = email;
         this.name = name;
         this.phone = phone;
-        this.InitialBonus = InitialBonus;
+        this.initialBonus = initialBonus;
+        this.bonusBalance = bonusBalance;
+        this.bonusPoints = bonusPoints;
+        this.userGroup = userGroup;
     }
 
     // Геттеры и сеттеры
@@ -54,10 +60,28 @@ public class CreateUserResponse {
      public String getPhone() {
         return phone;
     }
-     public void setInitialBonus(String InitialBonus) {
-        this.InitialBonus = InitialBonus;
+     public void setInitialBonus(String initialBonus) {
+        this.initialBonus = initialBonus;
     }
      public String getInitialBonus() {
-        return InitialBonus;
+        return initialBonus;
+    }
+    public void setBonusBalance(String bonusBalance) {
+        this.bonusBalance = bonusBalance;
+    }
+     public String getBonusBalance() {
+        return bonusBalance;
+    }
+    public void setBonusPoints(String bonusPoints) {
+        this.bonusPoints = bonusPoints;
+    }
+     public String getBonusPoints() {
+        return bonusPoints;
+    }
+    public void setUserGroup(String userGroup) {
+        this.userGroup = userGroup;
+    }
+     public String getUserGroup() {
+        return userGroup;
     }
 }

@@ -27,56 +27,45 @@ public class UserService {
     /**
      * Метод для создания нового пользователя
      */
-  @Transactional
-public CreateUserResponse createUser(CreateUserResponse request) {
-   CreateUserResponse response = new CreateUserResponse();
+@Transactional(noRollbackFor = {RuntimeException.class})
+public void updateUserWithQuery(Long userId, CreateUserResponse request) {
     try {
-        logger.info("Начало создания пользователя с email: {}", request.getEmail());
-        
-        // Валидация входных данных
-        String validationError = validateUserRequest(request);
-        if (validationError != null) {
-            logger.warn("Ошибка валидации: {}", validationError);
-        response.setSuccess(false);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
-        return response;
+        // Проверяем существование пользователя
+        if (!usersRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
         }
         
-        // Проверяем, существует ли пользователь с таким email
-        if (usersRepository.existsByEmail(request.getEmail())) {
-            String errorMessage = "Пользователь с email " + request.getEmail() + " уже существует";
-            logger.warn(errorMessage);
-        response.setSuccess(false);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
-        return response;
+        // Получаем текущего пользователя для проверок
+        User existingUser = usersRepository.findById(userId).orElseThrow();
+        
+        // Проверяем уникальность username
+        if (request.getName() != null && 
+            !existingUser.getUsername().equals(request.getName()) && 
+            usersRepository.existsByUsername(request.getName())) {
+            throw new RuntimeException("Username is already in use: " + request.getName());
         }
         
-        // Создаем нового пользователя
-        User newUser = createUserFromRequest(request);
-        User savedUser = usersRepository.save(newUser);
+        // Проверяем уникальность email
+        if (request.getEmail() != null && 
+            !existingUser.getEmail().equals(request.getEmail()) && 
+            usersRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already in use: " + request.getEmail());
+        }
         
-        logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
+        // Вызываем метод репозитория
+        usersRepository.updateUser(
+            userId,
+            request.getName() != null ? request.getName() : existingUser.getUsername(),
+            request.getEmail() != null ? request.getEmail() : existingUser.getEmail(),
+            request.getPhone() != null ? request.getPhone() : existingUser.getPhone(),
+            request.getBonusBalance() != null ? request.getBonusBalance() : existingUser.getBonusBalance(),
+            request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
+            request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
+        );
         
-        // Возвращаем успешный ответ
- response.setSuccess(true);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
-        return response;
-        
-    } catch (DataAccessException e) {
-        logger.error("Ошибка доступа к данным при создании пользователя: {}", e.getMessage());
-      response.setSuccess(false);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
-        return response;
     } catch (Exception e) {
-        logger.error("Непредвиденная ошибка при создании пользователя: {}", e.getMessage(), e);
-     response.setSuccess(false);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
-        return response;
+        logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
+        throw e; // Пробрасываем исключение дальше
     }
 }
     
@@ -89,7 +78,7 @@ public CreateUserResponse createUser(CreateUserResponse request) {
         }
         
         if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            return "Email обязателен";
+            return  "Email обязателен";
         }
         
         // Базовая валидация email
