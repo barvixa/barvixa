@@ -4,7 +4,7 @@ public class CreateUserRequest {
     private String name;
     private String email;
     private String phone;
-    private Integer initialBonus;
+    private String initialBonus;
     private String bonusBalance;
     private String points;
     private String userGroup;
@@ -15,7 +15,7 @@ public class CreateUserRequest {
     // Конструкторы
     public CreateUserRequest() {}
 
-    public CreateUserRequest(String name, String email, String phone, Integer initialBonus, String bonusBalance,String points, String userGroup, String bonusePoint) {
+    public CreateUserRequest(String name, String email, String phone, String initialBonus, String bonusBalance,String points, String userGroup, String bonusePoint) {
         this.name = name;
         this.email = email;
         this.phone = phone;
@@ -51,11 +51,11 @@ public class CreateUserRequest {
         this.phone = phone;
     }
 
-    public Integer getInitialBonus() {
+    public String getInitialBonus() {
         return initialBonus;
     }
 
-    public void setInitialBonus(Integer initialBonus) {
+    public void setInitialBonus(String initialBonus) {
         this.initialBonus = initialBonus;
     }
     public String getBonusBalance() {

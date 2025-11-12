@@ -5,14 +5,18 @@ public class CreateUserResponse {
     private String message;
     private String email;
     private String name;
+    private String phone;
+    private String InitialBonus;
     // Конструкторы
     public CreateUserResponse() {}
 
-    public CreateUserResponse(boolean success, String message, String emale, String email, String name) {
+    public CreateUserResponse(boolean success, String message, String email, String name, String phone, String InitialBonus) {
         this.success = success;
         this.message = message;
         this.email = email;
         this.name = name;
+        this.phone = phone;
+        this.InitialBonus = InitialBonus;
     }
 
     // Геттеры и сеттеры
@@ -43,5 +47,17 @@ public class CreateUserResponse {
     }
      public String getName() {
         return name;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+     public String getPhone() {
+        return phone;
+    }
+     public void setInitialBonus(String InitialBonus) {
+        this.InitialBonus = InitialBonus;
+    }
+     public String getInitialBonus() {
+        return InitialBonus;
     }
 }

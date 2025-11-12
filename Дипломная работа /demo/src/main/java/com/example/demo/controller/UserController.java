@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.CreateUserRequest;
 import com.example.demo.dto.CreateUserResponse;
 import com.example.demo.dto.User;
 import com.example.demo.service.UserService;

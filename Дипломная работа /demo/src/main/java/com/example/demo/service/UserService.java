@@ -27,39 +27,58 @@ public class UserService {
     /**
      * Метод для создания нового пользователя
      */
-    @Transactional
-    public CreateUserResponse createUser(CreateUserResponse request) {
-        try {
-            logger.info("Начало создания пользователя с email: {}", request.getEmail());
-            
-            // Валидация входных данных
-            String validationError = validateUserRequest(request);
-            if (validationError != null) {
-                logger.warn("Ошибка валидации: {}", validationError);
-                return new CreateUserResponse(false, validationError);
-            }
-            
-            // Проверяем, существует ли пользователь с таким email
-            if (usersRepository.existsByEmail(request.getEmail())) {
-                logger.warn("Пользователь с email {} уже существует", request.getEmail());
-                return new CreateUserResponse(false, "Пользователь с таким email уже существует");
-            }
-            
-            // Создаем нового пользователя
-            User newUser = createUserFromRequest(request);
-            User savedUser = usersRepository.save(newUser);
-            
-            logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
-            return new CreateUserResponse(true, "Пользователь успешно создан с ID: " + savedUser.getId());
-            
-        } catch (DataAccessException e) {
-            logger.error("Ошибка доступа к данным при создании пользователя: {}", e.getMessage());
-            return new CreateUserResponse(false, "Ошибка базы данных при создании пользователя");
-        } catch (Exception e) {
-            logger.error("Непредвиденная ошибка при создании пользователя: {}", e.getMessage(), e);
-            return new CreateUserResponse(false, "Внутренняя ошибка сервера");
+  @Transactional
+public CreateUserResponse createUser(CreateUserResponse request) {
+   CreateUserResponse response = new CreateUserResponse();
+    try {
+        logger.info("Начало создания пользователя с email: {}", request.getEmail());
+        
+        // Валидация входных данных
+        String validationError = validateUserRequest(request);
+        if (validationError != null) {
+            logger.warn("Ошибка валидации: {}", validationError);
+        response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
         }
+        
+        // Проверяем, существует ли пользователь с таким email
+        if (usersRepository.existsByEmail(request.getEmail())) {
+            String errorMessage = "Пользователь с email " + request.getEmail() + " уже существует";
+            logger.warn(errorMessage);
+        response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
+        }
+        
+        // Создаем нового пользователя
+        User newUser = createUserFromRequest(request);
+        User savedUser = usersRepository.save(newUser);
+        
+        logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
+        
+        // Возвращаем успешный ответ
+ response.setSuccess(true);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
+        
+    } catch (DataAccessException e) {
+        logger.error("Ошибка доступа к данным при создании пользователя: {}", e.getMessage());
+      response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
+    } catch (Exception e) {
+        logger.error("Непредвиденная ошибка при создании пользователя: {}", e.getMessage(), e);
+     response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
     }
+}
     
     /**
      * Валидация данных запроса
@@ -107,7 +126,7 @@ public class UserService {
     /**
      * Создание объекта User из запроса
      */
-    private User createUserFromRequest(CreateUserRequest request) {
+    private User createUserFromRequest(CreateUserResponse request) {
         User user = new User();
         user.setUsername(request.getName().trim());
         user.setEmail(request.getEmail().trim().toLowerCase());
