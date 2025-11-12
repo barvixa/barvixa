@@ -27,7 +27,7 @@ public interface UsersRepository extends JpaRepository<User, Long> {
     
     // Метод для обновления пользователя с учетом ваших полей
     @Modifying
-    @Query("UPDATE User u SET u.name = :username, u.email = :email, u.phone = :phone, u.bonusBalance = :bonusBalance, u.bonusPoints = :bonusPoints, u.userGroup = :userGroup WHERE u.id = :id")
+    @Query("UPDATE User u SET u.username = :username, u.email = :email, u.phone = :phone, u.bonusBalance = :bonusBalance, u.bonusPoints = :bonusPoints, u.userGroup = :userGroup WHERE u.id = :id")
     void updateUser(
         @Param("id") Long id,
         @Param("username") String username,

@@ -28,7 +28,7 @@ public class UserService {
      * Метод для создания нового пользователя
      */
     @Transactional
-    public CreateUserResponse createUser(CreateUserRequest request) {
+    public CreateUserResponse createUser(CreateUserResponse request) {
         try {
             logger.info("Начало создания пользователя с email: {}", request.getEmail());
             
@@ -64,7 +64,7 @@ public class UserService {
     /**
      * Валидация данных запроса
      */
-    private String validateUserRequest(CreateUserRequest request) {
+    private String validateUserRequest(CreateUserResponse request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             return "Имя пользователя обязательно";
         }

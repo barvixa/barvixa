@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.CreateUserRequest;
 import com.example.demo.dto.CreateUserResponse;
 import com.example.demo.dto.User;
 import com.example.demo.service.UserService;
@@ -19,7 +20,7 @@ public class UserController {
 
     @PostMapping("/create")
     public CreateUserResponse createUser(@RequestBody CreateUserResponse request) {
-        return createUser(request);
+        return userService.createUser(request);
         
     }
        @GetMapping("/all")
