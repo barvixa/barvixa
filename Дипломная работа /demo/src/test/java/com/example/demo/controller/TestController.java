@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.model.User;
+import com.example.demo.dto.User;
 import com.example.demo.repository.UsersRepository;
 
 import io.swagger.v3.oas.annotations.Operation;

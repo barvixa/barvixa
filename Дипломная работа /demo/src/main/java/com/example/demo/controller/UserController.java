@@ -1,6 +1,11 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.CreateUserResponse;
+import com.example.demo.dto.User;
 import com.example.demo.service.UserService;
+
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,7 +19,12 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public UserService.CreateUserResponse createUser(@RequestBody UserService.CreateUserRequest request) {
+    public UserService.CreateUserResponse createUser(@RequestBody CreateUserResponse request) {
         return userService.createUser(request);
+        
+    }
+       @GetMapping("/all")
+    public List<User> getUsers() {
+        return userService.findAll();
     }
 }

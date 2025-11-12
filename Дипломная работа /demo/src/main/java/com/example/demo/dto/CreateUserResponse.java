@@ -1,4 +1,4 @@
-package com.example.demo.model.dto;
+package com.example.demo.dto;
 
 public class CreateUserResponse {
     private boolean success;

@@ -1,9 +1,14 @@
 package com.example.demo.repository;  
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.model.User;
+import com.example.demo.dto.User;
+
+import java.util.Optional;
 
 @Repository
 public interface UsersRepository extends JpaRepository<User, Long> {
@@ -16,4 +21,21 @@ public interface UsersRepository extends JpaRepository<User, Long> {
     
     // Метод для поиска пользователя по email
     User findByEmail(String email);
+    
+    // Метод для поиска по ID (опционально, для лучшей обработки)
+    Optional<User> findById(Long id);
+    
+    // Метод для обновления пользователя с учетом ваших полей
+    @Modifying
+    @Query("UPDATE User u SET u.name = :name, u.username = :username, u.email = :email, u.phone = :phone, u.bonusBalance = :bonusBalance, u.bonusPoints = :bonusPoints, u.userGroup = :userGroup WHERE u.id = :id")
+    void updateUser(
+        @Param("id") Long id,
+        @Param("name") String name,
+        @Param("username") String username,
+        @Param("email") String email,
+        @Param("phone") String phone,
+        @Param("bonusBalance") String bonusBalance,
+        @Param("bonusPoints") String bonusPoints,
+        @Param("userGroup") String userGroup
+    );
 }

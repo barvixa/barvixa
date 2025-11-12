@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.demo.dto;
 
 import jakarta.persistence.*;
 
@@ -17,16 +17,22 @@ public class User {
     
     private String phone;
     
-    private Integer bonusPoints;
+    private String bonusPoints;
+    
+    private String bonusBalance;
+
+    private String userGroup;
     
     // Конструкторы
     public User() {}
     
-    public User(String username, String email, String phone, Integer bonusPoints) {
+    public User(String username, String email, String phone, String bonusPoints, String bonusBalance, String userGroup) {
         this.username = username;
         this.email = email;
         this.phone = phone;
         this.bonusPoints = bonusPoints;
+        this.bonusBalance = bonusBalance;
+        this.userGroup = userGroup;
     }
     
     // геттеры и сеттеры
@@ -42,6 +48,13 @@ public class User {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
     
-    public Integer getBonusPoints() { return bonusPoints; }
-    public void setBonusPoints(Integer bonusPoints) { this.bonusPoints = bonusPoints; }
+    public String getBonusPoints() { return bonusPoints; }
+    public void setBonusPoints(String bonusPoints) { this.bonusPoints = bonusPoints; }
+
+    public  String getBonusBalance() { return bonusBalance; }
+    public void setBonusBalance(String bonusBalance) { this.bonusBalance = bonusBalance; }
+
+    public  String getUserGroup() { return userGroup; }
+    public void setUserGroup(String userGroup) { this.userGroup = userGroup; }
+    
 }

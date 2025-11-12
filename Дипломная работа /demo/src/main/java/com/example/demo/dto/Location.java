@@ -1,6 +1,6 @@
-package com.example.demo.model;  // Важно: пакет model, а не enums!
+package com.example.demo.dto;  // Важно: пакет model, а не enums!
 
-import com.example.demo.model.enums.LocationType;
+import com.example.demo.enums.LocationType;
 
 import jakarta.persistence.*;
 

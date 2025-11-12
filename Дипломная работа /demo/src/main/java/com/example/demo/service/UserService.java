@@ -1,7 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.model.User;
+import com.example.demo.dto.CreateUserRequest;
+import com.example.demo.dto.User;
 import com.example.demo.repository.UsersRepository;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -112,66 +116,52 @@ public class UserService {
         }
         
         if (request.getInitialBonus() != null) {
-            user.setBonusPoints(request.getInitialBonus());
+            user.setBonusPoints(String.valueOf(request.getInitialBonus()));
         } else {
-            user.setBonusPoints(0); // значение по умолчанию
+            user.setBonusPoints("0"); // значение по умолчанию
         }
         
         return user;
     }
-    
-    // DTO классы для запроса и ответа
-    
-    public static class CreateUserRequest {
-        private String name;
-        private String email;
-        private String phone;
-        private Integer initialBonus;
-
-        // Конструкторы
-        public CreateUserRequest() {}
-
-        public CreateUserRequest(String name, String email, String phone, Integer initialBonus) {
-            this.name = name;
-            this.email = email;
-            this.phone = phone;
-            this.initialBonus = initialBonus;
-        }
-
-        // Геттеры и сеттеры
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getPhone() {
-            return phone;
-        }
-
-        public void setPhone(String phone) {
-            this.phone = phone;
-        }
-
-        public Integer getInitialBonus() {
-            return initialBonus;
-        }
-
-        public void setInitialBonus(Integer initialBonus) {
-            this.initialBonus = initialBonus;
-        }
+    public List<User> findAll() {
+      return usersRepository.findAll();
     }
-    
+    @Transactional
+    public void updateUserWithQuery(Long userId, CreateUserRequest request) {
+        // Проверяем существование пользователя
+        if (!usersRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+        
+        // Получаем текущего пользователя для проверок
+        User existingUser = usersRepository.findById(userId).orElseThrow();
+        
+        // Проверяем уникальность username
+        if (request.getName() != null && 
+            !existingUser.getUsername().equals(request.getName()) && 
+            usersRepository.existsByUsername(request.getName())) {
+            throw new RuntimeException("Username is already in use: " + request.getName());
+        }
+        
+        // Проверяем уникальность email
+        if (request.getEmail() != null && 
+            !existingUser.getEmail().equals(request.getEmail()) && 
+            usersRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already in use: " + request.getEmail());
+        }
+        
+        // Вызываем метод репозитория
+        usersRepository.updateUser(
+            userId,
+            request.getName() != null ? request.getName() : existingUser.getUsername(),
+            request.getName() != null ? request.getName() : existingUser.getUsername(),
+            request.getEmail() != null ? request.getEmail() : existingUser.getEmail(),
+            request.getPhone() != null ? request.getPhone() : existingUser.getPhone(),
+            request.getBonusBalance() != null ? request.getBonusBalance() : existingUser.getBonusBalance(),
+            request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
+            request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
+        );
+    }
     public static class CreateUserResponse {
         private boolean success;
         private String message;
