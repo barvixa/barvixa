@@ -155,7 +155,6 @@ public class UserService {
         usersRepository.updateUser(
             userId,
             request.getName() != null ? request.getName() : existingUser.getUsername(),
-            request.getName() != null ? request.getName() : existingUser.getUsername(),
             request.getEmail() != null ? request.getEmail() : existingUser.getEmail(),
             request.getPhone() != null ? request.getPhone() : existingUser.getPhone(),
             request.getBonusBalance() != null ? request.getBonusBalance() : existingUser.getBonusBalance(),
