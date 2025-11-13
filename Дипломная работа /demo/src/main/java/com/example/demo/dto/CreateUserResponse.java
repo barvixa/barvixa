@@ -24,6 +24,7 @@ public class CreateUserResponse {
         this.bonusPoints = bonusPoints;
         this.userGroup = userGroup;
     }
+    
 
     // Геттеры и сеттеры
     public boolean isSuccess() {

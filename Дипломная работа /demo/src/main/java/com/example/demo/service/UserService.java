@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.CreateUserRequest;
 import com.example.demo.dto.CreateUserResponse;
 import com.example.demo.dto.User;
 import com.example.demo.repository.UsersRepository;
@@ -135,39 +134,57 @@ public void updateUserWithQuery(Long userId, CreateUserResponse request) {
     public List<User> findAll() {
       return usersRepository.findAll();
     }
+    
     @Transactional
-    public void updateUserWithQuery(Long userId, CreateUserRequest request) {
-        // Проверяем существование пользователя
-        if (!usersRepository.existsById(userId)) {
-            throw new RuntimeException("User not found with id: " + userId);
+public CreateUserResponse createUser(CreateUserResponse request) {
+   CreateUserResponse response = new CreateUserResponse();
+    try {
+        logger.info("Начало создания пользователя с email: {}", request.getEmail());
+        
+        // Валидация входных данных
+        String validationError = validateUserRequest(request);
+        if (validationError != null) {
+            logger.warn("Ошибка валидации: {}", validationError);
+        response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
         }
         
-        // Получаем текущего пользователя для проверок
-        User existingUser = usersRepository.findById(userId).orElseThrow();
-        
-        // Проверяем уникальность username
-        if (request.getName() != null && 
-            !existingUser.getUsername().equals(request.getName()) && 
-            usersRepository.existsByUsername(request.getName())) {
-            throw new RuntimeException("Username is already in use: " + request.getName());
+        // Проверяем, существует ли пользователь с таким email
+        if (usersRepository.existsByEmail(request.getEmail())) {
+            String errorMessage = "Пользователь с email " + request.getEmail() + " уже существует";
+            logger.warn(errorMessage);
+        response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
         }
         
-        // Проверяем уникальность email
-        if (request.getEmail() != null && 
-            !existingUser.getEmail().equals(request.getEmail()) && 
-            usersRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email is already in use: " + request.getEmail());
-        }
+        // Создаем нового пользователя
+        User newUser = createUserFromRequest(request);
+        User savedUser = usersRepository.save(newUser);
         
-        // Вызываем метод репозитория
-        usersRepository.updateUser(
-            userId,
-            request.getName() != null ? request.getName() : existingUser.getUsername(),
-            request.getEmail() != null ? request.getEmail() : existingUser.getEmail(),
-            request.getPhone() != null ? request.getPhone() : existingUser.getPhone(),
-            request.getBonusBalance() != null ? request.getBonusBalance() : existingUser.getBonusBalance(),
-            request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
-            request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
-        );
+        logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
+        
+        // Возвращаем успешный ответ
+ response.setSuccess(true);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
+        
+    } catch (DataAccessException e) {
+        logger.error("Ошибка доступа к данным при создании пользователя: {}", e.getMessage());
+      response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
+    } catch (Exception e) {
+        logger.error("Непредвиденная ошибка при создании пользователя: {}", e.getMessage(), e);
+     response.setSuccess(false);
+        response.setEmail(request.getEmail());
+        response.setName(request.getName());
+        return response;
     }
+}
 }
