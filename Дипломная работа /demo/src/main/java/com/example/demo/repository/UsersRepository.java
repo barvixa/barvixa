@@ -37,4 +37,5 @@ public interface UsersRepository extends JpaRepository<User, Long> {
         @Param("bonusPoints") String bonusPoints,
         @Param("userGroup") String userGroup
     );
+    
 }

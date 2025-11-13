@@ -4,6 +4,7 @@ import com.example.demo.dto.CreateUserResponse;
 import com.example.demo.dto.User;
 import com.example.demo.repository.UsersRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -262,5 +263,27 @@ public CreateUserResponse createUser(CreateUserResponse request) {
         response.setInitialBonus(request.getInitialBonus());
         return response;
     }
+    
+}
+public BigDecimal getTotalBonusBalance() {
+    List<User> users = usersRepository.findAll();
+    return users.stream()
+        .map(user -> {logger.info(user.getBonusPoints());
+            String bonusStr = user.getBonusPoints();
+            if (bonusStr != null && !bonusStr.trim().isEmpty()) {
+                try {
+                    // Убираем пробелы и запятые, заменяем запятые на точки если нужно
+                    String cleaned = bonusStr.trim()
+                                          .replace(" ", "")
+                                          .replace(",", ".");
+                    return new BigDecimal(cleaned);
+                } catch (NumberFormatException e) {
+                    logger.warn("Invalid bonus format for user {}: {}", user.getId(), bonusStr);
+                    return BigDecimal.ZERO;
+                }
+            }
+            return BigDecimal.ZERO;
+        })
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
 }
 }

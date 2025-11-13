@@ -344,15 +344,15 @@
         
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-number" id="totalUsers"></div>
                 <div class="stat-label">Всего пользователей</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="totalBonuses">0</div>
+                <div class="stat-number" id="totalBonuses"></div>
                 <div class="stat-label">Всего бонусов</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="avgBonuses">0</div>
+                <div class="stat-number" id="avgBonuses"></div>
                 <div class="stat-label">Среднее бонусов</div>
             </div>
         </div>
@@ -855,16 +855,54 @@
         }
 
         // Функция обновления статистики
-        function updateStatistics(users) {
-            const totalUsers = users.length;
-            const totalBonuses = users.reduce((sum, user) => sum + (user.bonusPoints || 0), 0);
-            const avgBonuses = totalUsers > 0 ? Math.round(totalBonuses / totalUsers) : 0;
+function updateStatistics() {
+    fetch('/api/users/bonuses/total')
+        .then(response => response.json())
+        .then(data => {
+            let usersArray = [];
+            
+            // Преобразуем данные в массив
+            if (Array.isArray(data)) {
+                usersArray = data;
+            } else if (data && typeof data === 'object') {
+                // Пытаемся найти массив в объекте
+                for (let key in data) {
+                    if (Array.isArray(data[key])) {
+                        usersArray = data[key];
+                        break;
+                    }
+                }
+                // Если не нашли массив, используем объект как единственный элемент
+                if (usersArray.length === 0) {
+                    usersArray = [data];
+                }
+            }
+            
+            const totalUsers = usersArray.length;
+            let totalBonuses = 0;
+            
+            // Вместо reduce используем обычный цикл
+            for (let user of usersArray) {
+                if (user && user.bonusBalance !== null && user.bonusBalance !== undefined) {
+                    const bonus = parseFloat(String(user.bonusBalance).replace(/\s/g, '').replace(',', '.')) || 0;
+                    totalBonuses += bonus;
+                }
+            }
+            
+            const avgBonuses = totalUsers > 0 ? (totalBonuses / totalUsers).toFixed(2) : '0.00';
             
             document.getElementById('totalUsers').textContent = totalUsers;
-            document.getElementById('totalBonuses').textContent = totalBonuses;
+            document.getElementById('totalBonuses').textContent = totalBonuses.toFixed(2);
             document.getElementById('avgBonuses').textContent = avgBonuses;
-        }
-
+            
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            document.getElementById('totalUsers').textContent = '0';
+            document.getElementById('totalBonuses').textContent = '0.00';
+            document.getElementById('avgBonuses').textContent = '0.00';
+        });
+}
         // Функция форматирования даты
         function formatDate(dateString) {
             if (!dateString) return 'Не указана';

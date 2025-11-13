@@ -5,8 +5,10 @@ import com.example.demo.dto.CreateUserResponse;
 import com.example.demo.dto.User;
 import com.example.demo.service.UserService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,5 +39,9 @@ public CreateUserResponse updateUser(
 public CreateUserResponse deleteUser(@PathVariable Long id) {
     return userService.deleteUser(id);
 }
-
+@GetMapping("/bonuses/total")
+public ResponseEntity<BigDecimal> getTotalBonuses() {
+    BigDecimal total = userService.getTotalBonusBalance();
+    return ResponseEntity.ok(total);
+}
 }
