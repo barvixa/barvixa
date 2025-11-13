@@ -9,13 +9,14 @@ public class CreateUserRequest {
     private String points;
     private String userGroup;
     private String bonusPoint;
+    private String userName;
     
  
 
     // Конструкторы
     public CreateUserRequest() {}
 
-    public CreateUserRequest(String name, String email, String phone, String initialBonus, String bonusBalance,String points, String userGroup, String bonusePoint) {
+    public CreateUserRequest(String name, String email, String phone, String initialBonus, String bonusBalance,String points, String userGroup, String bonusePoint,String userName ) {
         this.name = name;
         this.email = email;
         this.phone = phone;
@@ -23,7 +24,8 @@ public class CreateUserRequest {
         this.bonusBalance = bonusBalance;
         this.points =points;
         this.userGroup = userGroup;
-        this.bonusPoint =bonusePoint;
+        this.bonusPoint = bonusePoint;
+        this.userName = userName;
     }
 
     // Геттеры и сеттеры
@@ -69,5 +71,8 @@ public class CreateUserRequest {
     }
     public String bonusePoint(){
         return bonusPoint;
+    }
+     public String userName(){
+        return userName;
     }
 }

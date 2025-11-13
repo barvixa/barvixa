@@ -10,10 +10,11 @@ public class CreateUserResponse {
     private String bonusBalance;
     private String bonusPoints;
     private String userGroup;
+
     // Конструкторы
     public CreateUserResponse() {}
 
-    public CreateUserResponse(boolean success, String message, String email, String name, String phone, String initialBonus,String bonusBalance,String bonusPoints, String userGroup ) {
+    public CreateUserResponse(boolean success, String message, String email, String name, String phone, String initialBonus,String bonusBalance,String bonusPoints, String userGroup) {
         this.success = success;
         this.message = message;
         this.email = email;

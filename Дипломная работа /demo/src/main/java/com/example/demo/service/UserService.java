@@ -27,11 +27,11 @@ public class UserService {
      * Метод для создания нового пользователя
      */
 @Transactional(noRollbackFor = {RuntimeException.class})
-public void updateUserWithQuery(Long userId, CreateUserResponse request) {
+public CreateUserResponse updateUserWithQuery(Long userId, CreateUserResponse request) {
     try {
         // Проверяем существование пользователя
         if (!usersRepository.existsById(userId)) {
-            throw new RuntimeException("User not found with id: " + userId);
+            return createErrorResponse("User not found with id: " + userId, request);
         }
         
         // Получаем текущего пользователя для проверок
@@ -41,14 +41,14 @@ public void updateUserWithQuery(Long userId, CreateUserResponse request) {
         if (request.getName() != null && 
             !existingUser.getUsername().equals(request.getName()) && 
             usersRepository.existsByUsername(request.getName())) {
-            throw new RuntimeException("Username is already in use: " + request.getName());
+            return createErrorResponse("Username is already in use: " + request.getName(), request);
         }
         
         // Проверяем уникальность email
         if (request.getEmail() != null && 
             !existingUser.getEmail().equals(request.getEmail()) && 
             usersRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email is already in use: " + request.getEmail());
+            return createErrorResponse("Email is already in use: " + request.getEmail(), request);
         }
         
         // Вызываем метод репозитория
@@ -57,15 +57,75 @@ public void updateUserWithQuery(Long userId, CreateUserResponse request) {
             request.getName() != null ? request.getName() : existingUser.getUsername(),
             request.getEmail() != null ? request.getEmail() : existingUser.getEmail(),
             request.getPhone() != null ? request.getPhone() : existingUser.getPhone(),
-            request.getBonusBalance() != null ? request.getBonusBalance() : existingUser.getBonusBalance(),
+            request.getInitialBonus() != null ? request.getInitialBonus() : existingUser.getBonusPoints(),
             request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
             request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
         );
         
+        // Возвращаем успешный ответ
+        return createSuccessResponse("User updated successfully", request);
+        
     } catch (Exception e) {
         logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
-        throw e; // Пробрасываем исключение дальше
+        return createErrorResponse("Error updating user: " + e.getMessage(), request);
     }
+}
+@Transactional
+public CreateUserResponse deleteUser(Long userId) {
+    CreateUserResponse response = new CreateUserResponse();
+    try {
+        // Проверяем существование пользователя
+        if (!usersRepository.existsById(userId)) {
+            response.setSuccess(false);
+            response.setMessage("User not found with id: " + userId);
+            return response;
+        }
+        
+        // Получаем информацию о пользователе перед удалением
+        User user = usersRepository.findById(userId).orElseThrow();
+        
+        // Удаляем пользователя
+        usersRepository.deleteById(userId);
+        
+        logger.info("User successfully deleted with ID: {}", userId);
+        
+        response.setSuccess(true);
+        response.setMessage("User successfully deleted");
+        response.setEmail(user.getEmail());
+        response.setName(user.getName());
+        response.setPhone(user.getPhone());
+        
+        return response;
+        
+    } catch (Exception e) {
+        logger.error("Error deleting user with ID {}: {}", userId, e.getMessage());
+        response.setSuccess(false);
+        response.setMessage("Error deleting user: " + e.getMessage());
+        return response;
+    }
+}
+
+// Вспомогательные методы для создания ответов
+private CreateUserResponse createSuccessResponse(String message, CreateUserResponse request) {
+    CreateUserResponse response = new CreateUserResponse();
+    response.setSuccess(true);
+    response.setMessage(message);
+    response.setEmail(request.getEmail());
+    response.setName(request.getName());
+    response.setPhone(request.getPhone());
+    response.setInitialBonus(request.getInitialBonus());
+    return response;
+}
+
+private CreateUserResponse createErrorResponse(String errorMessage, CreateUserResponse request) {
+    CreateUserResponse response = new CreateUserResponse();
+    response.setSuccess(false);
+    response.setMessage(errorMessage);
+    response.setEmail(request.getEmail());
+    response.setName(request.getName());
+    response.setPhone(request.getPhone());
+    response.setInitialBonus(request.getInitialBonus());
+    return response;
 }
     
     /**
@@ -137,7 +197,7 @@ public void updateUserWithQuery(Long userId, CreateUserResponse request) {
     
     @Transactional
 public CreateUserResponse createUser(CreateUserResponse request) {
-   CreateUserResponse response = new CreateUserResponse();
+    CreateUserResponse response = new CreateUserResponse();
     try {
         logger.info("Начало создания пользователя с email: {}", request.getEmail());
         
@@ -145,20 +205,26 @@ public CreateUserResponse createUser(CreateUserResponse request) {
         String validationError = validateUserRequest(request);
         if (validationError != null) {
             logger.warn("Ошибка валидации: {}", validationError);
-        response.setSuccess(false);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
-        return response;
+            response.setSuccess(false);
+            response.setMessage(validationError);
+            response.setEmail(request.getEmail());
+            response.setName(request.getName());
+            response.setPhone(request.getPhone());
+            response.setInitialBonus(request.getInitialBonus());
+            return response;
         }
         
         // Проверяем, существует ли пользователь с таким email
         if (usersRepository.existsByEmail(request.getEmail())) {
             String errorMessage = "Пользователь с email " + request.getEmail() + " уже существует";
             logger.warn(errorMessage);
-        response.setSuccess(false);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
-        return response;
+            response.setSuccess(false);
+            response.setMessage(errorMessage);
+            response.setEmail(request.getEmail());
+            response.setName(request.getName());
+            response.setPhone(request.getPhone());
+            response.setInitialBonus(request.getInitialBonus());
+            return response;
         }
         
         // Создаем нового пользователя
@@ -168,22 +234,32 @@ public CreateUserResponse createUser(CreateUserResponse request) {
         logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
         
         // Возвращаем успешный ответ
- response.setSuccess(true);
-        response.setEmail(request.getEmail());
-        response.setName(request.getName());
+        response.setSuccess(true);
+        response.setMessage("Пользователь успешно создан");
+        response.setEmail(savedUser.getEmail());
+        response.setName(savedUser.getName());
+        response.setPhone(savedUser.getPhone());
+        response.setInitialBonus(savedUser.getBonusPoints()); // или другое поле для InitialBonus
+        
         return response;
         
     } catch (DataAccessException e) {
         logger.error("Ошибка доступа к данным при создании пользователя: {}", e.getMessage());
-      response.setSuccess(false);
+        response.setSuccess(false);
+        response.setMessage("Ошибка базы данных: " + e.getMessage());
         response.setEmail(request.getEmail());
         response.setName(request.getName());
+        response.setPhone(request.getPhone());
+        response.setInitialBonus(request.getInitialBonus());
         return response;
     } catch (Exception e) {
         logger.error("Непредвиденная ошибка при создании пользователя: {}", e.getMessage(), e);
-     response.setSuccess(false);
+        response.setSuccess(false);
+        response.setMessage("Внутренняя ошибка сервера");
         response.setEmail(request.getEmail());
         response.setName(request.getName());
+        response.setPhone(request.getPhone());
+        response.setInitialBonus(request.getInitialBonus());
         return response;
     }
 }

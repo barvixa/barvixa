@@ -22,17 +22,19 @@ public class User {
     private String bonusBalance;
 
     private String userGroup;
-    
+
+    private String name;
     // Конструкторы
     public User() {}
     
-    public User(String username, String email, String phone, String bonusPoints, String bonusBalance, String userGroup) {
+    public User(String username, String email, String phone, String bonusPoints, String bonusBalance, String userGroup, String name) {
         this.username = username;
         this.email = email;
         this.phone = phone;
         this.bonusPoints = bonusPoints;
         this.bonusBalance = bonusBalance;
         this.userGroup = userGroup;
+        this.name = name;
     }
     
     // геттеры и сеттеры
@@ -56,5 +58,8 @@ public class User {
 
     public  String getUserGroup() { return userGroup; }
     public void setUserGroup(String userGroup) { this.userGroup = userGroup; }
+
+     public  String getName() { return name; }
+    public void setName(String name) { this.name = name; }
     
 }
