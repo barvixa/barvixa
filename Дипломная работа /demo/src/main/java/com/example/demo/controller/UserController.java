@@ -24,15 +24,16 @@ public class UserController {
         
     }
 
-       @GetMapping("/all")
+    @GetMapping("/all")
     public List<User> getUsers() {
         return userService.findAll();
     }
 
     @PutMapping("/update/{id}")
     public CreateUserResponse updateUser(
-    @PathVariable Long id,  // Изменил на Long
-    @RequestBody CreateUserResponse request) {
+        @PathVariable Long id, 
+        @RequestBody CreateUserResponse request
+    ) {
         return userService.updateUserWithQuery(id, request);
     }
 
@@ -43,7 +44,7 @@ public class UserController {
 
     @GetMapping("/bonuses/total")
     public ResponseEntity<BigDecimal> getTotalBonuses() {
-    BigDecimal total = userService.getTotalBonusBalance();
+        BigDecimal total = userService.getTotalBonusBalance();
         return ResponseEntity.ok(total);
     }
 }
