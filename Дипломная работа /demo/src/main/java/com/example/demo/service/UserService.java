@@ -22,6 +22,7 @@ public class UserService {
     
     private UsersRepository usersRepository;
     private UserValidateService userValidateService;
+    private UserCreateFromRequestService userCreateFromRequestService;
 
     @Transactional(noRollbackFor = {RuntimeException.class})
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
@@ -136,23 +137,6 @@ public class UserService {
         }
     }  
 
-    private UserDto createUserFromRequest(CreateUserStatusDto request) {
-        UserDto user = new UserDto();
-        user.setUsername(request.getName().trim());
-        user.setEmail(request.getEmail().trim().toLowerCase());
-        
-        if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
-            user.setPhone(request.getPhone().trim());
-        }
-        
-        if (request.getInitialBonus() != null) {
-            user.setBonusPoints(String.valueOf(request.getInitialBonus()));
-        } else {
-            user.setBonusPoints("0"); 
-        }
-        
-        return user;
-    }
     public List<UserDto> findAll() {
       return usersRepository.findAll();
     }
@@ -186,8 +170,8 @@ public CreateUserStatusDto createUser(CreateUserStatusDto request) {
             response.setInitialBonus(request.getInitialBonus());
             return response;
         }
-
-        UserDto newUser = createUserFromRequest(request);
+        
+        UserDto newUser = userCreateFromRequestService.createUserFromRequest(request);
         UserDto savedUser = usersRepository.save(newUser);
         
         logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
