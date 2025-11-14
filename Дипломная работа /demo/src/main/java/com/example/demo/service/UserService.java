@@ -26,7 +26,16 @@ public class UserService {
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
         try {
             if (!usersRepository.existsById(userId)) {
-                return createErrorResponse("User not found with id: " + userId, request);
+                CreateUserStatusDto response = new CreateUserStatusDto(); 
+
+                response.setSuccess(false);
+                response.setMessage("User not found with id: " + userId);
+                response.setEmail(request.getEmail());
+                response.setName(request.getName());
+                response.setPhone(request.getPhone());
+                response.setInitialBonus(request.getInitialBonus());
+                
+                return response;
             }
             
             UserDto existingUser = usersRepository.findById(userId).orElseThrow();
@@ -60,7 +69,7 @@ public class UserService {
             response.setName(request.getName());
             response.setPhone(request.getPhone());
             response.setInitialBonus(request.getInitialBonus());
-            
+
             return response;  
         } catch (Exception e) {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
@@ -99,18 +108,6 @@ public class UserService {
             return response;
         }
     }
-
-private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserStatusDto request) {
-    CreateUserStatusDto response = new CreateUserStatusDto();
-    response.setSuccess(false);
-    response.setMessage(errorMessage);
-    response.setEmail(request.getEmail());
-    response.setName(request.getName());
-    response.setPhone(request.getPhone());
-    response.setInitialBonus(request.getInitialBonus());
-    return response;
-}
-    
 
     private String validateUserRequest(CreateUserStatusDto request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
