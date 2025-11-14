@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.CreateUserResponse;
+import com.example.demo.dto.CreateUserStatusDto;
 import com.example.demo.dto.User;
 import com.example.demo.repository.UsersRepository;
 
@@ -28,7 +28,7 @@ public class UserService {
      * Метод для создания нового пользователя
      */
 @Transactional(noRollbackFor = {RuntimeException.class})
-public CreateUserResponse updateUserWithQuery(Long userId, CreateUserResponse request) {
+public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
     try {
         // Проверяем существование пользователя
         if (!usersRepository.existsById(userId)) {
@@ -72,8 +72,8 @@ public CreateUserResponse updateUserWithQuery(Long userId, CreateUserResponse re
     }
 }
 @Transactional
-public CreateUserResponse deleteUser(Long userId) {
-    CreateUserResponse response = new CreateUserResponse();
+public CreateUserStatusDto deleteUser(Long userId) {
+    CreateUserStatusDto response = new CreateUserStatusDto();
     try {
         // Проверяем существование пользователя
         if (!usersRepository.existsById(userId)) {
@@ -107,8 +107,8 @@ public CreateUserResponse deleteUser(Long userId) {
 }
 
 // Вспомогательные методы для создания ответов
-private CreateUserResponse createSuccessResponse(String message, CreateUserResponse request) {
-    CreateUserResponse response = new CreateUserResponse();
+private CreateUserStatusDto createSuccessResponse(String message, CreateUserStatusDto request) {
+    CreateUserStatusDto response = new CreateUserStatusDto();
     response.setSuccess(true);
     response.setMessage(message);
     response.setEmail(request.getEmail());
@@ -118,8 +118,8 @@ private CreateUserResponse createSuccessResponse(String message, CreateUserRespo
     return response;
 }
 
-private CreateUserResponse createErrorResponse(String errorMessage, CreateUserResponse request) {
-    CreateUserResponse response = new CreateUserResponse();
+private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserStatusDto request) {
+    CreateUserStatusDto response = new CreateUserStatusDto();
     response.setSuccess(false);
     response.setMessage(errorMessage);
     response.setEmail(request.getEmail());
@@ -132,7 +132,7 @@ private CreateUserResponse createErrorResponse(String errorMessage, CreateUserRe
     /**
      * Валидация данных запроса
      */
-    private String validateUserRequest(CreateUserResponse request) {
+    private String validateUserRequest(CreateUserStatusDto request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             return "Имя пользователя обязательно";
         }
@@ -175,7 +175,7 @@ private CreateUserResponse createErrorResponse(String errorMessage, CreateUserRe
     /**
      * Создание объекта User из запроса
      */
-    private User createUserFromRequest(CreateUserResponse request) {
+    private User createUserFromRequest(CreateUserStatusDto request) {
         User user = new User();
         user.setUsername(request.getName().trim());
         user.setEmail(request.getEmail().trim().toLowerCase());
@@ -197,8 +197,8 @@ private CreateUserResponse createErrorResponse(String errorMessage, CreateUserRe
     }
     
     @Transactional
-public CreateUserResponse createUser(CreateUserResponse request) {
-    CreateUserResponse response = new CreateUserResponse();
+public CreateUserStatusDto createUser(CreateUserStatusDto request) {
+    CreateUserStatusDto response = new CreateUserStatusDto();
     try {
         logger.info("Начало создания пользователя с email: {}", request.getEmail());
         

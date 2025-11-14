@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.dto.CreateUserResponse;
+import com.example.demo.dto.CreateUserStatusDto;
 import com.example.demo.dto.User;
 import com.example.demo.service.UserService;
 
@@ -19,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/create")
-    public CreateUserResponse createUser(@RequestBody CreateUserResponse request) {
+    public CreateUserStatusDto createUser(@RequestBody CreateUserStatusDto request) {
         return userService.createUser(request);
         
     }
@@ -30,15 +30,15 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public CreateUserResponse updateUser(
+    public CreateUserStatusDto updateUser(
         @PathVariable Long id, 
-        @RequestBody CreateUserResponse request
+        @RequestBody CreateUserStatusDto request
     ) {
         return userService.updateUserWithQuery(id, request);
     }
 
     @DeleteMapping("/delete/{id}")
-    public CreateUserResponse deleteUser(@PathVariable Long id) {
+    public CreateUserStatusDto deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
     }
 

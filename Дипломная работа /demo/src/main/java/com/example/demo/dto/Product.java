@@ -13,13 +13,13 @@ public class Product {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private Category category;
+    private CategoryDto category;
     
     private Double price;
     
     public Product() {}
     
-    public Product(String name, Category category, Double price) {
+    public Product(String name, CategoryDto category, Double price) {
         this.name = name;
         this.category = category;
         this.price = price;
@@ -31,8 +31,8 @@ public class Product {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     
-    public Category getCategory() { return category; }
-    public void setCategory(Category category) { this.category = category; }
+    public CategoryDto getCategory() { return category; }
+    public void setCategory(CategoryDto category) { this.category = category; }
     
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
