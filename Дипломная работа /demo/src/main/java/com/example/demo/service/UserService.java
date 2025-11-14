@@ -3,9 +3,11 @@ package com.example.demo.service;
 import com.example.demo.dto.CreateUserStatusDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.repository.UsersRepository;
+import com.example.demo.status.StatusSuccess;
 
 import lombok.AllArgsConstructor;
 
+import java.io.ObjectInputFilter.Status;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -23,21 +25,13 @@ public class UserService {
     private UsersRepository usersRepository;
     private UserValidateService userValidateService;
     private UserCreateFromRequestService userCreateFromRequestService;
+    private StatusSuccess statusSuccess;
 
     @Transactional(noRollbackFor = {RuntimeException.class})
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
         try {
             if (!usersRepository.existsById(userId)) {
-                CreateUserStatusDto response = new CreateUserStatusDto(); 
-
-                response.setSuccess(false);
-                response.setMessage("User not found with id: " + userId);
-                response.setEmail(request.getEmail());
-                response.setName(request.getName());
-                response.setPhone(request.getPhone());
-                response.setInitialBonus(request.getInitialBonus());
-                
-                return response;
+                return statusSuccess.setSucess("User not found with id: " + userId);
             }
             
             UserDto existingUser = usersRepository.findById(userId).orElseThrow();
@@ -45,16 +39,7 @@ public class UserService {
             if (request.getName() != null && 
                 !existingUser.getUsername().equals(request.getName()) && 
                 usersRepository.existsByUsername(request.getName())) {
-                CreateUserStatusDto response = new CreateUserStatusDto();
-
-                response.setSuccess(false);
-                response.setMessage("Username is already in use: " + request.getName());
-                response.setEmail(request.getEmail());
-                response.setName(request.getName());
-                response.setPhone(request.getPhone());
-                response.setInitialBonus(request.getInitialBonus());
-
-                return response;
+                return statusSuccess.setSucess("Username is already in use: " + request.getName());
             }
             
             if (request.getEmail() != null && 
