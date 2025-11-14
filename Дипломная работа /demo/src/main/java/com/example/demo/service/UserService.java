@@ -43,7 +43,16 @@ public class UserService {
             if (request.getName() != null && 
                 !existingUser.getUsername().equals(request.getName()) && 
                 usersRepository.existsByUsername(request.getName())) {
-                return createErrorResponse("Username is already in use: " + request.getName(), request);
+                CreateUserStatusDto response = new CreateUserStatusDto();
+
+                response.setSuccess(false);
+                response.setMessage("Username is already in use: " + request.getName());
+                response.setEmail(request.getEmail());
+                response.setName(request.getName());
+                response.setPhone(request.getPhone());
+                response.setInitialBonus(request.getInitialBonus());
+
+                return response;
             }
             
             if (request.getEmail() != null && 
