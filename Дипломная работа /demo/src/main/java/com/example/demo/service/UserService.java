@@ -71,10 +71,8 @@ public class UserService {
                 response.setMessage("User not found with id: " + userId);
                 return response;
             }
-            
 
             UserDto user = usersRepository.findById(userId).orElseThrow();
-            
 
             usersRepository.deleteById(userId);
             
