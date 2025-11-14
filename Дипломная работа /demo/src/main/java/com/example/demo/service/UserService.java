@@ -104,67 +104,35 @@ public class UserService {
     
     @Transactional
     public CreateUserStatusDto createUser(CreateUserStatusDto request) {
-        CreateUserStatusDto response = new CreateUserStatusDto();
         try {
             logger.info("Начало создания пользователя с email: {}", request.getEmail());
             
             String validationError = userValidateService.validateUserRequest(request);
             if (validationError != null) {
                 logger.warn("Ошибка валидации: {}", validationError);
-                response.setSuccess(false);
-                response.setMessage(validationError);
-                response.setEmail(request.getEmail());
-                response.setName(request.getName());
-                response.setPhone(request.getPhone());
-                response.setInitialBonus(request.getInitialBonus());
-                return response;
+                return statusSuccess.setSucess(validationError,false,request);
             }
 
             if (usersRepository.existsByEmail(request.getEmail())) {
                 String errorMessage = "Пользователь с email " + request.getEmail() + " уже существует";
                 logger.warn(errorMessage);
-                response.setSuccess(false);
-                response.setMessage(errorMessage);
-                response.setEmail(request.getEmail());
-                response.setName(request.getName());
-                response.setPhone(request.getPhone());
-                response.setInitialBonus(request.getInitialBonus());
-                return response;
+                 return statusSuccess.setSucess(errorMessage,false,request);
             }
             
             UserDto newUser = userCreateFromRequestService.createUserFromRequest(request);
             UserDto savedUser = usersRepository.save(newUser);
             
             logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
+             return statusSuccess.setSucess("Пользователь успешно создан",true,request);
+            } 
 
-            response.setSuccess(true);
-            response.setMessage("Пользователь успешно создан");
-            response.setEmail(savedUser.getEmail());
-            response.setName(savedUser.getName());
-            response.setPhone(savedUser.getPhone());
-            response.setInitialBonus(savedUser.getBonusPoints()); 
-            
-            return response;
-            
-        } catch (DataAccessException e) {
+            catch (DataAccessException e) {
             logger.error("Ошибка доступа к данным при создании пользователя: {}", e.getMessage());
-            response.setSuccess(false);
-            response.setMessage("Ошибка базы данных: " + e.getMessage());
-            response.setEmail(request.getEmail());
-            response.setName(request.getName());
-            response.setPhone(request.getPhone());
-            response.setInitialBonus(request.getInitialBonus());
-            return response;
-        } catch (Exception e) {
-            logger.error("Непредвиденная ошибка при создании пользователя: {}", e.getMessage(), e);
-            response.setSuccess(false);
-            response.setMessage("Внутренняя ошибка сервера");
-            response.setEmail(request.getEmail());
-            response.setName(request.getName());
-            response.setPhone(request.getPhone());
-            response.setInitialBonus(request.getInitialBonus());
-            return response;
-        }
+             return statusSuccess.setSucess("Ошибка базы данных: " + e.getMessage(),false,request);
+            } 
+            catch (Exception e) {
+             return statusSuccess.setSucess("Внутренняя ошибка сервера",false,request);
+            }
     }
 
     public BigDecimal getTotalBonusBalance() {
