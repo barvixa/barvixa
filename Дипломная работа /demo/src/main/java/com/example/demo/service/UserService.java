@@ -52,9 +52,16 @@ public class UserService {
                 request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
                 request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
             );
+
+            CreateUserStatusDto response = new CreateUserStatusDto();
+            response.setSuccess(true);
+            response.setMessage("User updated successfully");
+            response.setEmail(request.getEmail());
+            response.setName(request.getName());
+            response.setPhone(request.getPhone());
+            response.setInitialBonus(request.getInitialBonus());
             
-            return createSuccessResponse("User updated successfully", request);
-            
+            return response;  
         } catch (Exception e) {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
             return createErrorResponse("Error updating user: " + e.getMessage(), request);
@@ -92,18 +99,6 @@ public class UserService {
             return response;
         }
     }
-
-
-private CreateUserStatusDto createSuccessResponse(String message, CreateUserStatusDto request) {
-    CreateUserStatusDto response = new CreateUserStatusDto();
-    response.setSuccess(true);
-    response.setMessage(message);
-    response.setEmail(request.getEmail());
-    response.setName(request.getName());
-    response.setPhone(request.getPhone());
-    response.setInitialBonus(request.getInitialBonus());
-    return response;
-}
 
 private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserStatusDto request) {
     CreateUserStatusDto response = new CreateUserStatusDto();
