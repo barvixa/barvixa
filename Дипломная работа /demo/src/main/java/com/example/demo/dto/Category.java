@@ -1,25 +1,14 @@
 package com.example.demo.dto;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "categories")
+@Data
 public class Category {
-      @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
-    
     private String name;
-    
-    public Category() {}
-    
-    public Category(String name) {
-        this.name = name;
-    }
-    
-    public Long getCategoryId() { return categoryId; }
-    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 }
