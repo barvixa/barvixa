@@ -22,36 +22,30 @@ public class UserService {
     
     private UsersRepository usersRepository;
 
-     /**
-     * Метод для обновления пользователя
-     */
-    
     @Transactional(noRollbackFor = {RuntimeException.class})
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
         try {
-            // Проверяем существование пользователя
+        
             if (!usersRepository.existsById(userId)) {
                 return createErrorResponse("User not found with id: " + userId, request);
             }
             
-            // Получаем текущего пользователя для проверок
+    
             UserDto existingUser = usersRepository.findById(userId).orElseThrow();
             
-            // Проверяем уникальность username
+        
             if (request.getName() != null && 
                 !existingUser.getUsername().equals(request.getName()) && 
                 usersRepository.existsByUsername(request.getName())) {
                 return createErrorResponse("Username is already in use: " + request.getName(), request);
             }
             
-            // Проверяем уникальность email
             if (request.getEmail() != null && 
                 !existingUser.getEmail().equals(request.getEmail()) && 
                 usersRepository.existsByEmail(request.getEmail())) {
                 return createErrorResponse("Email is already in use: " + request.getEmail(), request);
             }
             
-            // Вызываем метод репозитория
             usersRepository.updateUser(
                 userId,
                 request.getName() != null ? request.getName() : existingUser.getUsername(),
@@ -62,7 +56,6 @@ public class UserService {
                 request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
             );
             
-            // Возвращаем успешный ответ
             return createSuccessResponse("User updated successfully", request);
             
         } catch (Exception e) {
@@ -75,17 +68,17 @@ public class UserService {
 public CreateUserStatusDto deleteUser(Long userId) {
     CreateUserStatusDto response = new CreateUserStatusDto();
     try {
-        // Проверяем существование пользователя
+
         if (!usersRepository.existsById(userId)) {
             response.setSuccess(false);
             response.setMessage("User not found with id: " + userId);
             return response;
         }
         
-        // Получаем информацию о пользователе перед удалением
+
         UserDto user = usersRepository.findById(userId).orElseThrow();
         
-        // Удаляем пользователя
+
         usersRepository.deleteById(userId);
         
         logger.info("User successfully deleted with ID: {}", userId);
@@ -106,7 +99,7 @@ public CreateUserStatusDto deleteUser(Long userId) {
     }
 }
 
-// Вспомогательные методы для создания ответов
+
 private CreateUserStatusDto createSuccessResponse(String message, CreateUserStatusDto request) {
     CreateUserStatusDto response = new CreateUserStatusDto();
     response.setSuccess(true);
@@ -129,9 +122,7 @@ private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserS
     return response;
 }
     
-    /**
-     * Валидация данных запроса
-     */
+
     private String validateUserRequest(CreateUserStatusDto request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             return "Имя пользователя обязательно";
@@ -141,12 +132,11 @@ private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserS
             return  "Email обязателен";
         }
         
-        // Базовая валидация email
+
         if (!isValidEmail(request.getEmail())) {
             return "Некорректный формат email";
         }
-        
-        // Валидация телефона (если указан)
+
         if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
             if (!isValidPhone(request.getPhone())) {
                 return "Некорректный формат телефона";
@@ -156,25 +146,19 @@ private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserS
         return null;
     }
     
-    /**
-     * Проверка формата email
-     */
+
     private boolean isValidEmail(String email) {
-        // Простая валидация email
+
         return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
     
-    /**
-     * Проверка формата телефона
-     */
+
     private boolean isValidPhone(String phone) {
-        // Простая валидация телефона (только цифры, может начинаться с +)
+
         return phone != null && phone.matches("^[+]?[0-9]{10,15}$");
     }
     
-    /**
-     * Создание объекта User из запроса
-     */
+
     private UserDto createUserFromRequest(CreateUserStatusDto request) {
         UserDto user = new UserDto();
         user.setUsername(request.getName().trim());
@@ -187,7 +171,7 @@ private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserS
         if (request.getInitialBonus() != null) {
             user.setBonusPoints(String.valueOf(request.getInitialBonus()));
         } else {
-            user.setBonusPoints("0"); // значение по умолчанию
+            user.setBonusPoints("0"); 
         }
         
         return user;
@@ -202,7 +186,6 @@ public CreateUserStatusDto createUser(CreateUserStatusDto request) {
     try {
         logger.info("Начало создания пользователя с email: {}", request.getEmail());
         
-        // Валидация входных данных
         String validationError = validateUserRequest(request);
         if (validationError != null) {
             logger.warn("Ошибка валидации: {}", validationError);
@@ -214,8 +197,7 @@ public CreateUserStatusDto createUser(CreateUserStatusDto request) {
             response.setInitialBonus(request.getInitialBonus());
             return response;
         }
-        
-        // Проверяем, существует ли пользователь с таким email
+
         if (usersRepository.existsByEmail(request.getEmail())) {
             String errorMessage = "Пользователь с email " + request.getEmail() + " уже существует";
             logger.warn(errorMessage);
@@ -227,20 +209,18 @@ public CreateUserStatusDto createUser(CreateUserStatusDto request) {
             response.setInitialBonus(request.getInitialBonus());
             return response;
         }
-        
-        // Создаем нового пользователя
+
         UserDto newUser = createUserFromRequest(request);
         UserDto savedUser = usersRepository.save(newUser);
         
         logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
-        
-        // Возвращаем успешный ответ
+
         response.setSuccess(true);
         response.setMessage("Пользователь успешно создан");
         response.setEmail(savedUser.getEmail());
         response.setName(savedUser.getName());
         response.setPhone(savedUser.getPhone());
-        response.setInitialBonus(savedUser.getBonusPoints()); // или другое поле для InitialBonus
+        response.setInitialBonus(savedUser.getBonusPoints()); 
         
         return response;
         
@@ -272,7 +252,7 @@ public BigDecimal getTotalBonusBalance() {
             String bonusStr = user.getBonusPoints();
             if (bonusStr != null && !bonusStr.trim().isEmpty()) {
                 try {
-                    // Убираем пробелы и запятые, заменяем запятые на точки если нужно
+ 
                     String cleaned = bonusStr.trim()
                                           .replace(" ", "")
                                           .replace(",", ".");
