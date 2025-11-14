@@ -1,11 +1,13 @@
-package com.example.demo.dto;  // Важно: пакет model, а не enums!
+package com.example.demo.dto; 
 
 import com.example.demo.enums.LocationType;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "locations")
+@Data
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,29 +21,5 @@ public class Location {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_location_id")
     private Location parentLocation;
-    
-    public Location() {}
-    
-    public Location(LocationType locationType, String name) {
-        this.locationType = locationType;
-        this.name = name;
-    }
-    
-    public Location(LocationType locationType, String name, Location parentLocation) {
-        this.locationType = locationType;
-        this.name = name;
-        this.parentLocation = parentLocation;
-    }
-    
-    public Long getLocationId() { return locationId; }
-    public void setLocationId(Long locationId) { this.locationId = locationId; }
-    
-    public LocationType getLocationType() { return locationType; }
-    public void setLocationType(LocationType locationType) { this.locationType = locationType; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public Location getParentLocation() { return parentLocation; }
-    public void setParentLocation(Location parentLocation) { this.parentLocation = parentLocation; }
+
 }
