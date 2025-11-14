@@ -7,7 +7,6 @@ import com.example.demo.status.StatusSuccess;
 
 import lombok.AllArgsConstructor;
 
-import java.io.ObjectInputFilter.Status;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class UserService {
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
         try {
             if (!usersRepository.existsById(userId)) {
-                return statusSuccess.setSucess("User not found with id: " + userId);
+                return statusSuccess.setSucess("User not found with id: " + userId,false,request);
             }
             
             UserDto existingUser = usersRepository.findById(userId).orElseThrow();
@@ -39,22 +38,13 @@ public class UserService {
             if (request.getName() != null && 
                 !existingUser.getUsername().equals(request.getName()) && 
                 usersRepository.existsByUsername(request.getName())) {
-                return statusSuccess.setSucess("Username is already in use: " + request.getName());
+                return statusSuccess.setSucess("Username is already in use: " + request.getName(),false,request);
             }
             
             if (request.getEmail() != null && 
                 !existingUser.getEmail().equals(request.getEmail()) && 
                 usersRepository.existsByEmail(request.getEmail())) {
-                 CreateUserStatusDto response = new CreateUserStatusDto();
-
-                response.setSuccess(false);
-                response.setMessage("Email is already in use: " + request.getEmail());
-                response.setEmail(request.getEmail());
-                response.setName(request.getName());
-                response.setPhone(request.getPhone());
-                response.setInitialBonus(request.getInitialBonus());
-
-                return response;
+                 return statusSuccess.setSucess("Email is already in use: " + request.getEmail(),false,request);
             }
             
             usersRepository.updateUser(
@@ -67,15 +57,7 @@ public class UserService {
                 request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
             );
 
-            CreateUserStatusDto response = new CreateUserStatusDto();
-            response.setSuccess(true);
-            response.setMessage("User updated successfully");
-            response.setEmail(request.getEmail());
-            response.setName(request.getName());
-            response.setPhone(request.getPhone());
-            response.setInitialBonus(request.getInitialBonus());
-
-            return response;  
+            return statusSuccess.setSucess("Email is already in use: " + request.getEmail(),true,request); 
         } catch (Exception e) {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
             CreateUserStatusDto response = new CreateUserStatusDto();
