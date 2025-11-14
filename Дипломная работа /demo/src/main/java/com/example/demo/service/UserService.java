@@ -61,40 +61,40 @@ public class UserService {
         }
     }
     
-@Transactional
-public CreateUserStatusDto deleteUser(Long userId) {
-    CreateUserStatusDto response = new CreateUserStatusDto();
-    try {
+    @Transactional
+    public CreateUserStatusDto deleteUser(Long userId) {
+        CreateUserStatusDto response = new CreateUserStatusDto();
+        try {
 
-        if (!usersRepository.existsById(userId)) {
+            if (!usersRepository.existsById(userId)) {
+                response.setSuccess(false);
+                response.setMessage("User not found with id: " + userId);
+                return response;
+            }
+            
+
+            UserDto user = usersRepository.findById(userId).orElseThrow();
+            
+
+            usersRepository.deleteById(userId);
+            
+            logger.info("User successfully deleted with ID: {}", userId);
+            
+            response.setSuccess(true);
+            response.setMessage("User successfully deleted");
+            response.setEmail(user.getEmail());
+            response.setName(user.getName());
+            response.setPhone(user.getPhone());
+            
+            return response;
+            
+        } catch (Exception e) {
+            logger.error("Error deleting user with ID {}: {}", userId, e.getMessage());
             response.setSuccess(false);
-            response.setMessage("User not found with id: " + userId);
+            response.setMessage("Error deleting user: " + e.getMessage());
             return response;
         }
-        
-
-        UserDto user = usersRepository.findById(userId).orElseThrow();
-        
-
-        usersRepository.deleteById(userId);
-        
-        logger.info("User successfully deleted with ID: {}", userId);
-        
-        response.setSuccess(true);
-        response.setMessage("User successfully deleted");
-        response.setEmail(user.getEmail());
-        response.setName(user.getName());
-        response.setPhone(user.getPhone());
-        
-        return response;
-        
-    } catch (Exception e) {
-        logger.error("Error deleting user with ID {}: {}", userId, e.getMessage());
-        response.setSuccess(false);
-        response.setMessage("Error deleting user: " + e.getMessage());
-        return response;
     }
-}
 
 
 private CreateUserStatusDto createSuccessResponse(String message, CreateUserStatusDto request) {
