@@ -13,5 +13,4 @@ public class CreateUserStatusDto {
     private String bonusBalance;
     private String bonusPoints;
     private String userGroup;
-
 }

@@ -1,39 +1,18 @@
 package com.example.demo.dto;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "products")
+@Data
 public class Product {
-       @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
-    
     private String name;
-    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private CategoryDto category;
-    
     private Double price;
-    
-    public Product() {}
-    
-    public Product(String name, CategoryDto category, Double price) {
-        this.name = name;
-        this.category = category;
-        this.price = price;
-    }
-    
-    public Long getProductId() { return productId; }
-    public void setProductId(Long productId) { this.productId = productId; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public CategoryDto getCategory() { return category; }
-    public void setCategory(CategoryDto category) { this.category = category; }
-    
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
 }
