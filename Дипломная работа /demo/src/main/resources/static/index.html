@@ -856,52 +856,47 @@
 
         // Функция обновления статистики
 function updateStatistics() {
-    fetch('/api/users/bonuses/total')
-        .then(response => response.json())
-        .then(data => {
-            let usersArray = [];
-            
-            // Преобразуем данные в массив
-            if (Array.isArray(data)) {
-                usersArray = data;
-            } else if (data && typeof data === 'object') {
-                // Пытаемся найти массив в объекте
-                for (let key in data) {
-                    if (Array.isArray(data[key])) {
-                        usersArray = data[key];
-                        break;
-                    }
-                }
-                // Если не нашли массив, используем объект как единственный элемент
-                if (usersArray.length === 0) {
-                    usersArray = [data];
-                }
-            }
-            
-            const totalUsers = usersArray.length;
-            let totalBonuses = 0;
-            
-            // Вместо reduce используем обычный цикл
-            for (let user of usersArray) {
-                if (user && user.bonusBalance !== null && user.bonusBalance !== undefined) {
-                    const bonus = parseFloat(String(user.bonusBalance).replace(/\s/g, '').replace(',', '.')) || 0;
-                    totalBonuses += bonus;
-                }
-            }
-            
-            const avgBonuses = totalUsers > 0 ? (totalBonuses / totalUsers).toFixed(2) : '0.00';
-            
-            document.getElementById('totalUsers').textContent = totalUsers;
-            document.getElementById('totalBonuses').textContent = totalBonuses.toFixed(2);
-            document.getElementById('avgBonuses').textContent = avgBonuses;
-            
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            document.getElementById('totalUsers').textContent = '0';
-            document.getElementById('totalBonuses').textContent = '0.00';
-            document.getElementById('avgBonuses').textContent = '0.00';
-        });
+    // Делаем параллельные запросы
+    Promise.all([
+        fetch('/api/users/all').then(r => r.json()),
+        fetch('/api/users/bonuses/total').then(r => r.json())
+    ])
+    .then(([usersData, totalBonuses]) => {
+        console.log('Данные пользователей:', usersData);
+        console.log('Общая сумма бонусов:', totalBonuses);
+        
+        // Обрабатываем массив пользователей
+        let usersArray = [];
+        if (Array.isArray(usersData)) {
+            usersArray = usersData;
+        } else if (usersData && Array.isArray(usersData.content)) {
+            usersArray = usersData.content;
+        } else if (usersData && Array.isArray(usersData.users)) {
+            usersArray = usersData.users;
+        } else if (usersData && typeof usersData === 'object') {
+            usersArray = [usersData];
+        }
+        
+        const totalUsers = usersArray.length;
+        
+        // Преобразуем totalBonuses в число
+        const totalBonusesValue = parseFloat(totalBonuses) || 0;
+        
+        // Считаем средние бонусы
+        const avgBonuses = totalUsers > 0 ? (totalBonusesValue / totalUsers).toFixed(2) : '0.00';
+        
+        // Обновляем DOM
+        document.getElementById('totalUsers').textContent = totalUsers;
+        document.getElementById('totalBonuses').textContent = totalBonusesValue.toFixed(2);
+        document.getElementById('avgBonuses').textContent = avgBonuses;
+        
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        document.getElementById('totalUsers').textContent = '0';
+        document.getElementById('totalBonuses').textContent = '0.00';
+        document.getElementById('avgBonuses').textContent = '0.00';
+    });
 }
         // Функция форматирования даты
         function formatDate(dateString) {
