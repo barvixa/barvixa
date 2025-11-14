@@ -25,15 +25,12 @@ public class UserService {
     @Transactional(noRollbackFor = {RuntimeException.class})
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
         try {
-        
             if (!usersRepository.existsById(userId)) {
                 return createErrorResponse("User not found with id: " + userId, request);
             }
             
-    
             UserDto existingUser = usersRepository.findById(userId).orElseThrow();
             
-        
             if (request.getName() != null && 
                 !existingUser.getUsername().equals(request.getName()) && 
                 usersRepository.existsByUsername(request.getName())) {
