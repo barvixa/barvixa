@@ -206,25 +206,24 @@ public class UserService {
         }
     }
 
-public BigDecimal getTotalBonusBalance() {
-    List<UserDto> users = usersRepository.findAll();
-    return users.stream()
-        .map(user -> {logger.info(user.getBonusPoints());
-            String bonusStr = user.getBonusPoints();
-            if (bonusStr != null && !bonusStr.trim().isEmpty()) {
-                try {
- 
-                    String cleaned = bonusStr.trim()
-                                          .replace(" ", "")
-                                          .replace(",", ".");
-                    return new BigDecimal(cleaned);
-                } catch (NumberFormatException e) {
-                    logger.warn("Invalid bonus format for user {}: {}", user.getId(), bonusStr);
-                    return BigDecimal.ZERO;
+    public BigDecimal getTotalBonusBalance() {
+        return findAll().stream()
+            .map(user -> {logger.info(user.getBonusPoints());
+                String bonusStr = user.getBonusPoints();
+                if (bonusStr != null && !bonusStr.trim().isEmpty()) {
+                    try {
+    
+                        String cleaned = bonusStr.trim()
+                                            .replace(" ", "")
+                                            .replace(",", ".");
+                        return new BigDecimal(cleaned);
+                    } catch (NumberFormatException e) {
+                        logger.warn("Invalid bonus format for user {}: {}", user.getId(), bonusStr);
+                        return BigDecimal.ZERO;
+                    }
                 }
-            }
-            return BigDecimal.ZERO;
-        })
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-}
+                return BigDecimal.ZERO;
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }
