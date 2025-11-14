@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.CreateUserStatusDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.repository.UsersRepository;
+import com.example.demo.status.StatusError;
 import com.example.demo.status.StatusSuccess;
 
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class UserService {
     private UserValidateService userValidateService;
     private UserCreateFromRequestService userCreateFromRequestService;
     private StatusSuccess statusSuccess;
+    private StatusError statusError;
 
     @Transactional(noRollbackFor = {RuntimeException.class})
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
@@ -60,15 +62,7 @@ public class UserService {
             return statusSuccess.setSucess("Email is already in use: " + request.getEmail(),true,request); 
         } catch (Exception e) {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
-            CreateUserStatusDto response = new CreateUserStatusDto();
-            response.setSuccess(false);
-            response.setMessage("User updated successfully");
-            response.setEmail(request.getEmail());
-            response.setName(request.getName());
-            response.setPhone(request.getPhone());
-            response.setInitialBonus(request.getInitialBonus());
-
-            return response;
+           return statusError.setError("Error updating user with ID {}: {}" + userId + e.getMessage(),false,request);
         }
     }
     
