@@ -21,9 +21,11 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     
     private UsersRepository usersRepository;
+
      /**
-     * Метод для создания нового пользователя
+     * Метод для обновления пользователя
      */
+    
     @Transactional(noRollbackFor = {RuntimeException.class})
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
         try {
