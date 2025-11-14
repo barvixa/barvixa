@@ -94,7 +94,7 @@ public class UserService {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
             CreateUserStatusDto response = new CreateUserStatusDto();
             response.setSuccess(false);
-            response.setMessage(errorMessage);
+            response.setMessage("User updated successfully");
             response.setEmail(request.getEmail());
             response.setName(request.getName());
             response.setPhone(request.getPhone());
