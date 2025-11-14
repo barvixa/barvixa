@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CreateUserStatusDto;
-import com.example.demo.dto.User;
+import com.example.demo.dto.UserDto;
 import com.example.demo.repository.UsersRepository;
 
 import java.math.BigDecimal;
@@ -36,7 +36,7 @@ public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto 
         }
         
         // Получаем текущего пользователя для проверок
-        User existingUser = usersRepository.findById(userId).orElseThrow();
+        UserDto existingUser = usersRepository.findById(userId).orElseThrow();
         
         // Проверяем уникальность username
         if (request.getName() != null && 
@@ -83,7 +83,7 @@ public CreateUserStatusDto deleteUser(Long userId) {
         }
         
         // Получаем информацию о пользователе перед удалением
-        User user = usersRepository.findById(userId).orElseThrow();
+        UserDto user = usersRepository.findById(userId).orElseThrow();
         
         // Удаляем пользователя
         usersRepository.deleteById(userId);
@@ -175,8 +175,8 @@ private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserS
     /**
      * Создание объекта User из запроса
      */
-    private User createUserFromRequest(CreateUserStatusDto request) {
-        User user = new User();
+    private UserDto createUserFromRequest(CreateUserStatusDto request) {
+        UserDto user = new UserDto();
         user.setUsername(request.getName().trim());
         user.setEmail(request.getEmail().trim().toLowerCase());
         
@@ -192,7 +192,7 @@ private CreateUserStatusDto createErrorResponse(String errorMessage, CreateUserS
         
         return user;
     }
-    public List<User> findAll() {
+    public List<UserDto> findAll() {
       return usersRepository.findAll();
     }
     
@@ -229,8 +229,8 @@ public CreateUserStatusDto createUser(CreateUserStatusDto request) {
         }
         
         // Создаем нового пользователя
-        User newUser = createUserFromRequest(request);
-        User savedUser = usersRepository.save(newUser);
+        UserDto newUser = createUserFromRequest(request);
+        UserDto savedUser = usersRepository.save(newUser);
         
         logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
         
@@ -266,7 +266,7 @@ public CreateUserStatusDto createUser(CreateUserStatusDto request) {
     
 }
 public BigDecimal getTotalBonusBalance() {
-    List<User> users = usersRepository.findAll();
+    List<UserDto> users = usersRepository.findAll();
     return users.stream()
         .map(user -> {logger.info(user.getBonusPoints());
             String bonusStr = user.getBonusPoints();

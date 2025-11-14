@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.dto.User;
+import com.example.demo.dto.UserDto;
 
 import java.util.Optional;
 
 @Repository
-public interface UsersRepository extends JpaRepository<User, Long> {
+public interface UsersRepository extends JpaRepository<UserDto, Long> {
     
     // Метод для проверки существования пользователя по email
     boolean existsByEmail(String email);
@@ -20,10 +20,10 @@ public interface UsersRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     
     // Метод для поиска пользователя по email
-    User findByEmail(String email);
+    UserDto findByEmail(String email);
     
     // Метод для поиска по ID (опционально, для лучшей обработки)
-    Optional<User> findById(Long id);
+    Optional<UserDto> findById(Long id);
     
     // Метод для обновления пользователя с учетом ваших полей
     @Modifying

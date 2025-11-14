@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.dto.CreateUserStatusDto;
-import com.example.demo.dto.User;
+import com.example.demo.dto.UserDto;
 import com.example.demo.service.UserService;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public List<User> getUsers() {
+    public List<UserDto> getUsers() {
         return userService.findAll();
     }
 
