@@ -65,7 +65,6 @@ public class UserService {
     public CreateUserStatusDto deleteUser(Long userId) {
         CreateUserStatusDto response = new CreateUserStatusDto();
         try {
-
             if (!usersRepository.existsById(userId)) {
                 response.setSuccess(false);
                 response.setMessage("User not found with id: " + userId);
