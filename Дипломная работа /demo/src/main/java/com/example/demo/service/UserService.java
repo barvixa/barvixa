@@ -24,50 +24,50 @@ public class UserService {
      /**
      * Метод для создания нового пользователя
      */
-@Transactional(noRollbackFor = {RuntimeException.class})
-public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
-    try {
-        // Проверяем существование пользователя
-        if (!usersRepository.existsById(userId)) {
-            return createErrorResponse("User not found with id: " + userId, request);
+    @Transactional(noRollbackFor = {RuntimeException.class})
+    public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
+        try {
+            // Проверяем существование пользователя
+            if (!usersRepository.existsById(userId)) {
+                return createErrorResponse("User not found with id: " + userId, request);
+            }
+            
+            // Получаем текущего пользователя для проверок
+            UserDto existingUser = usersRepository.findById(userId).orElseThrow();
+            
+            // Проверяем уникальность username
+            if (request.getName() != null && 
+                !existingUser.getUsername().equals(request.getName()) && 
+                usersRepository.existsByUsername(request.getName())) {
+                return createErrorResponse("Username is already in use: " + request.getName(), request);
+            }
+            
+            // Проверяем уникальность email
+            if (request.getEmail() != null && 
+                !existingUser.getEmail().equals(request.getEmail()) && 
+                usersRepository.existsByEmail(request.getEmail())) {
+                return createErrorResponse("Email is already in use: " + request.getEmail(), request);
+            }
+            
+            // Вызываем метод репозитория
+            usersRepository.updateUser(
+                userId,
+                request.getName() != null ? request.getName() : existingUser.getUsername(),
+                request.getEmail() != null ? request.getEmail() : existingUser.getEmail(),
+                request.getPhone() != null ? request.getPhone() : existingUser.getPhone(),
+                request.getInitialBonus() != null ? request.getInitialBonus() : existingUser.getBonusPoints(),
+                request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
+                request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
+            );
+            
+            // Возвращаем успешный ответ
+            return createSuccessResponse("User updated successfully", request);
+            
+        } catch (Exception e) {
+            logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
+            return createErrorResponse("Error updating user: " + e.getMessage(), request);
         }
-        
-        // Получаем текущего пользователя для проверок
-        UserDto existingUser = usersRepository.findById(userId).orElseThrow();
-        
-        // Проверяем уникальность username
-        if (request.getName() != null && 
-            !existingUser.getUsername().equals(request.getName()) && 
-            usersRepository.existsByUsername(request.getName())) {
-            return createErrorResponse("Username is already in use: " + request.getName(), request);
-        }
-        
-        // Проверяем уникальность email
-        if (request.getEmail() != null && 
-            !existingUser.getEmail().equals(request.getEmail()) && 
-            usersRepository.existsByEmail(request.getEmail())) {
-            return createErrorResponse("Email is already in use: " + request.getEmail(), request);
-        }
-        
-        // Вызываем метод репозитория
-        usersRepository.updateUser(
-            userId,
-            request.getName() != null ? request.getName() : existingUser.getUsername(),
-            request.getEmail() != null ? request.getEmail() : existingUser.getEmail(),
-            request.getPhone() != null ? request.getPhone() : existingUser.getPhone(),
-            request.getInitialBonus() != null ? request.getInitialBonus() : existingUser.getBonusPoints(),
-            request.getBonusPoints() != null ? request.getBonusPoints() : existingUser.getBonusPoints(),
-            request.getUserGroup() != null ? request.getUserGroup() : existingUser.getUserGroup()
-        );
-        
-        // Возвращаем успешный ответ
-        return createSuccessResponse("User updated successfully", request);
-        
-    } catch (Exception e) {
-        logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
-        return createErrorResponse("Error updating user: " + e.getMessage(), request);
     }
-}
     
 @Transactional
 public CreateUserStatusDto deleteUser(Long userId) {
