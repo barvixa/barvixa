@@ -64,6 +64,7 @@ public class UserService {
     @Transactional
     public CreateUserStatusDto deleteUser(Long userId) {
         CreateUserStatusDto response = new CreateUserStatusDto();
+
         try {
             if (!usersRepository.existsById(userId)) {
                 response.setSuccess(false);
@@ -83,8 +84,7 @@ public class UserService {
             response.setName(user.getName());
             response.setPhone(user.getPhone());
             
-            return response;
-            
+            return response;  
         } catch (Exception e) {
             logger.error("Error deleting user with ID {}: {}", userId, e.getMessage());
             response.setSuccess(false);
