@@ -58,7 +58,16 @@ public class UserService {
             if (request.getEmail() != null && 
                 !existingUser.getEmail().equals(request.getEmail()) && 
                 usersRepository.existsByEmail(request.getEmail())) {
-                return createErrorResponse("Email is already in use: " + request.getEmail(), request);
+                 CreateUserStatusDto response = new CreateUserStatusDto();
+
+                response.setSuccess(false);
+                response.setMessage("Email is already in use: " + request.getEmail());
+                response.setEmail(request.getEmail());
+                response.setName(request.getName());
+                response.setPhone(request.getPhone());
+                response.setInitialBonus(request.getInitialBonus());
+
+                return response;
             }
             
             usersRepository.updateUser(
