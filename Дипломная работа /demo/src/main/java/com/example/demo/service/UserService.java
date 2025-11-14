@@ -91,7 +91,15 @@ public class UserService {
             return response;  
         } catch (Exception e) {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
-            return createErrorResponse("Error updating user: " + e.getMessage(), request);
+            CreateUserStatusDto response = new CreateUserStatusDto();
+            response.setSuccess(false);
+            response.setMessage("Error updating user: " + e.getMessage());
+            response.setEmail(request.getEmail());
+            response.setName(request.getName());
+            response.setPhone(request.getPhone());
+            response.setInitialBonus(request.getInitialBonus());
+
+            return response;
         }
     }
     
