@@ -21,6 +21,7 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     
     private UsersRepository usersRepository;
+    private UserValidateService userValidateService;
 
     @Transactional(noRollbackFor = {RuntimeException.class})
     public CreateUserStatusDto updateUserWithQuery(Long userId, CreateUserStatusDto request) {
@@ -93,7 +94,7 @@ public class UserService {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
             CreateUserStatusDto response = new CreateUserStatusDto();
             response.setSuccess(false);
-            response.setMessage("Error updating user: " + e.getMessage());
+            response.setMessage(errorMessage);
             response.setEmail(request.getEmail());
             response.setName(request.getName());
             response.setPhone(request.getPhone());
@@ -133,43 +134,7 @@ public class UserService {
             response.setMessage("Error deleting user: " + e.getMessage());
             return response;
         }
-    }
-
-    private String validateUserRequest(CreateUserStatusDto request) {
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            return "Имя пользователя обязательно";
-        }
-        
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            return  "Email обязателен";
-        }
-        
-
-        if (!isValidEmail(request.getEmail())) {
-            return "Некорректный формат email";
-        }
-
-        if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
-            if (!isValidPhone(request.getPhone())) {
-                return "Некорректный формат телефона";
-            }
-        }
-        
-        return null;
-    }
-    
-
-    private boolean isValidEmail(String email) {
-
-        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-    }
-    
-
-    private boolean isValidPhone(String phone) {
-
-        return phone != null && phone.matches("^[+]?[0-9]{10,15}$");
-    }
-    
+    }  
 
     private UserDto createUserFromRequest(CreateUserStatusDto request) {
         UserDto user = new UserDto();
@@ -198,7 +163,7 @@ public CreateUserStatusDto createUser(CreateUserStatusDto request) {
     try {
         logger.info("Начало создания пользователя с email: {}", request.getEmail());
         
-        String validationError = validateUserRequest(request);
+        String validationError = userValidateService.validateUserRequest(request);
         if (validationError != null) {
             logger.warn("Ошибка валидации: {}", validationError);
             response.setSuccess(false);
