@@ -1,5 +1,9 @@
 package com.example.demo.dto;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,4 +23,7 @@ public class UserDto {
     private String bonusBalance;
     private String userGroup;
     private String name;
+   @Column(name = "registration_date", updatable = false)
+   @CreationTimestamp
+   private LocalDateTime registrationDate;
 }

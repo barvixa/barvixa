@@ -12,17 +12,6 @@
 <body>
     <div class="container">
         <h1>📊 Система бонусов и лояльности</h1>
-        
-        <!-- Новая кнопка для получения данных -->
-        <div style="text-align: center; margin-bottom: 20px;">
-            <button class="get-data" onclick="getBackendData()">📥 Получить данные с бекенда</button>
-        </div>
-        
-        <div id="backendData" class="data-display" style="display: none;">
-            <h3>📋 Данные от бекенда:</h3>
-            <div id="dataContent"></div>
-        </div>
-        
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers"></div>
@@ -361,7 +350,6 @@
                 currentUsers = users;
                 updateStatistics(users);
                 renderUserList(users, highlightNew);
-                renderUserTable(users);
                 
             } catch (error) {
                 console.error('Ошибка при загрузке пользователей:', error);
@@ -371,53 +359,6 @@
                     </div>
                 `;
             }
-        }
-
-        // // Функция отрисовки таблицы пользователей
-        function renderUserTable(users) {
-            const tbody = document.querySelector('#tbodyGetUsersData');
-            
-            if (users.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="10" style="text-align: center;">
-                            Нет данных для отображения
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            tbody.innerHTML = users.map((item) => {
-                const userId = item.userId !== undefined ? item.userId : (item.id || 'N/A');
-                const bonusBalance = item.bonusBalance !== undefined ? item.bonusBalance : (item.bonusPoints || 0);
-                const userGroup = item.userGroup || 'Не указана';
-                const UserName = item.UserName || 'Не указано';
-                const id = item.id || 'N/A';
-                const bonusPoints = item.bonusPoints || 0;
-                const email = item.email || 'Не указан';
-                const phone = item.phone || 'Не указан';
-                const username = item.username || 'Не указан';
-                const safeName = UserName ? UserName.replace(/'/g, "\\'") : '';
-                
-                return `
-                    <tr>
-                        <td>${id}</td>
-                        <td>${userId}</td>
-                        <td>${bonusBalance}</td>
-                        <td>${userGroup}</td>
-                        <td>${UserName}</td>
-                        <td>${bonusPoints}</td>
-                        <td>${email}</td>
-                        <td>${phone}</td>
-                        <td>${username}</td>
-                        <td>
-                            <button class="edit" onclick="openEditModal(${id})">✏️</button>
-                            <button class="delete" onclick="deleteUser(${id}, '${safeName}')">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
         }
 
         // Функция отрисовки списка пользователей
@@ -452,14 +393,6 @@
                 return `
                     <div class="user-card ${isNew ? 'new-user' : ''}" id="user-${userId}">
                         <div class="user-info">
-                            <div class="user-field">
-                                <strong>ID:</strong>
-                                <div class="user-value">${userId}</div>
-                            </div>
-                            <div class="user-field">
-                                <strong>User ID:</strong>
-                                <div class="user-value">${userUserId}</div>
-                            </div>
                             <div class="user-field">
                                 <strong>Bonus Balance:</strong>
                                 <div class="user-value">${userBonusBalance}</div>
