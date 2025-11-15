@@ -24,7 +24,7 @@ import com.example.demo.repository.AuthRepository;
 @RequestMapping
 @CrossOrigin("*")
 public class AuthRepository {
-     public static String encodePassword(String rawPassword) {
+     public String encodePassword(String rawPassword) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(rawPassword.getBytes());
@@ -62,7 +62,7 @@ public class AuthRepository {
     ) {
         try {
             var hashed = jdbcTemplate.queryForObject (
-                "select password_hash from users where username=?",
+                "select password from users where username=?",
                 String.class, username
             );
 

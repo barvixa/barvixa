@@ -23,6 +23,8 @@ public class UserDto {
     private String bonusBalance;
     private String userGroup;
     private String name;
+    @Column(nullable = false)
+    private String password;
    @Column(name = "registration_date", updatable = false)
    @CreationTimestamp
    private LocalDateTime registrationDate;

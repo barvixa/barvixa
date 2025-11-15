@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 @AllArgsConstructor
 public class AuthController {
     public JdbcTemplate jdbcTemplate;
-    private AuthRepository userRepo;
+    // private AuthRepository userRepo;
 
     @PostMapping("/login")
     @ResponseBody
@@ -28,11 +28,5 @@ public class AuthController {
             AuthRepository userRepo
     ) {
         return LoginService.login(loginForm, userRepo, jdbcTemplate);
-    }
-
-    @PostMapping("/registration")
-    @ResponseBody
-    public ResponseEntity<?> registrationUser (@RequestBody AuthDto auth) {
-        return userRepo.create(auth, jdbcTemplate);
     }
 }

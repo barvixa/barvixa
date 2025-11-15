@@ -14,6 +14,7 @@ public class StatusSuccess {
     response.setName(request.getName());
     response.setPhone(request.getPhone());
     response.setInitialBonus(request.getInitialBonus());
+    response.setPassword(request.getPassword());
                     
     return response;
    }

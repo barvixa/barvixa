@@ -127,11 +127,11 @@ public class UserService {
             
             UserDto newUser = userCreateFromRequestService.createUserFromRequest(request);
             UserDto savedUser = usersRepository.save(newUser);
-            
+            logger.info(savedUser.getPassword());
             logger.info("Пользователь успешно создан с ID: {}", savedUser.getId());
              return statusSuccess.setSucess("Пользователь успешно создан",true,request);
-            } 
-
+            }
+            
             catch (DataAccessException e) {
             logger.error("Ошибка доступа к данным при создании пользователя: {}", e.getMessage());
              return statusSuccess.setSucess("Ошибка базы данных: " + e.getMessage(),false,request);
