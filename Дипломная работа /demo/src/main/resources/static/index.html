@@ -347,85 +347,78 @@
         });
 
         // Функция загрузки списка пользователей
-        // async function loadUsers(highlightNew = false) {
-        //     try {
-        //         document.getElementById('userList').innerHTML = '<div class="loading">Загрузка пользователей...</div>';
+        async function loadUsers(highlightNew = false) {
+            try {
+                document.getElementById('userList').innerHTML = '<div class="loading">Загрузка пользователей...</div>';
                 
-        //         const response = await fetch('/api/users/all');
-        //         if (!response.ok) {
-        //             throw new Error(`HTTP error! status: ${response.status}`);
-        //         }
-        //         const users = await response.json();
-        //         console.log('Полученные данные:', users);
+                const response = await fetch('/api/users/all');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const users = await response.json();
+                console.log('Полученные данные:', users);
                 
-        //         currentUsers = users;
-        //         updateStatistics(users);
-        //         renderUserList(users, highlightNew);
-        //         renderUserTable(users);
+                currentUsers = users;
+                updateStatistics(users);
+                renderUserList(users, highlightNew);
+                renderUserTable(users);
                 
-        //     } catch (error) {
-        //         console.error('Ошибка при загрузке пользователей:', error);
-        //         document.getElementById('userList').innerHTML = `
-        //             <div class="result error">
-        //                 ❌ Ошибка при загрузке пользователей: ${error.message}
-        //             </div>
-        //         `;
-        //         document.querySelector('#tbodyGetUsersData').innerHTML = `
-        //             <tr>
-        //                 <td colspan="10" style="text-align: center; color: #e74c3c;">
-        //                     ❌ Ошибка при загрузке данных: ${error.message}
-        //                 </td>
-        //             </tr>
-        //         `;
-        //     }
-        // }
+            } catch (error) {
+                console.error('Ошибка при загрузке пользователей:', error);
+                document.getElementById('userList').innerHTML = `
+                    <div class="result error">
+                        ❌ Ошибка при загрузке пользователей: ${error.message}
+                    </div>
+                `;
+            }
+        }
 
         // // Функция отрисовки таблицы пользователей
-        // function renderUserTable(users) {
-        //     const tbody = document.querySelector('#tbodyGetUsersData');
+        function renderUserTable(users) {
+            const tbody = document.querySelector('#tbodyGetUsersData');
             
-        //     if (users.length === 0) {
-        //         tbody.innerHTML = `
-        //             <tr>
-        //                 <td colspan="10" style="text-align: center;">
-        //                     Нет данных для отображения
-        //                 </td>
-        //             </tr>
-        //         `;
-        //         return;
-        //     }
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center;">
+                            Нет данных для отображения
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
             
-        //     tbody.innerHTML = users.map((item) => {
-        //         const userId = item.userId !== undefined ? item.userId : (item.id || 'N/A');
-        //         const bonusBalance = item.bonusBalance !== undefined ? item.bonusBalance : (item.bonusPoints || 0);
-        //         const userGroup = item.userGroup || 'Не указана';
-        //         const UserName = item.UserName || 'Не указано';
-        //         const id = item.id || 'N/A';
-        //         const bonusPoints = item.bonusPoints || 0;
-        //         const email = item.email || 'Не указан';
-        //         const phone = item.phone || 'Не указан';
-        //         const username = item.username || 'Не указан';
-        //         const safeName = UserName ? UserName.replace(/'/g, "\\'") : '';
+            tbody.innerHTML = users.map((item) => {
+                const userId = item.userId !== undefined ? item.userId : (item.id || 'N/A');
+                const bonusBalance = item.bonusBalance !== undefined ? item.bonusBalance : (item.bonusPoints || 0);
+                const userGroup = item.userGroup || 'Не указана';
+                const UserName = item.UserName || 'Не указано';
+                const id = item.id || 'N/A';
+                const bonusPoints = item.bonusPoints || 0;
+                const email = item.email || 'Не указан';
+                const phone = item.phone || 'Не указан';
+                const username = item.username || 'Не указан';
+                const safeName = UserName ? UserName.replace(/'/g, "\\'") : '';
                 
-        //         return `
-        //             <tr>
-        //                 <td>${id}</td>
-        //                 <td>${userId}</td>
-        //                 <td>${bonusBalance}</td>
-        //                 <td>${userGroup}</td>
-        //                 <td>${UserName}</td>
-        //                 <td>${bonusPoints}</td>
-        //                 <td>${email}</td>
-        //                 <td>${phone}</td>
-        //                 <td>${username}</td>
-        //                 <td>
-        //                     <button class="edit" onclick="openEditModal(${id})">✏️</button>
-        //                     <button class="delete" onclick="deleteUser(${id}, '${safeName}')">🗑️</button>
-        //                 </td>
-        //             </tr>
-        //         `;
-        //     }).join('');
-        // }
+                return `
+                    <tr>
+                        <td>${id}</td>
+                        <td>${userId}</td>
+                        <td>${bonusBalance}</td>
+                        <td>${userGroup}</td>
+                        <td>${UserName}</td>
+                        <td>${bonusPoints}</td>
+                        <td>${email}</td>
+                        <td>${phone}</td>
+                        <td>${username}</td>
+                        <td>
+                            <button class="edit" onclick="openEditModal(${id})">✏️</button>
+                            <button class="delete" onclick="deleteUser(${id}, '${safeName}')">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
         // Функция отрисовки списка пользователей
         function renderUserList(users, highlightNew = false) {
