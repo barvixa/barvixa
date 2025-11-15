@@ -11,7 +11,7 @@ import com.example.demo.dto.UserDto;
 import java.util.Optional;
 
 @Repository
-public interface UsersRepository extends JpaRepository<UserDto, Long> {
+public interface UserRepository extends JpaRepository<UserDto, Long> {
     
     // Метод для проверки существования пользователя по email
     boolean existsByEmail(String email);
@@ -27,7 +27,7 @@ public interface UsersRepository extends JpaRepository<UserDto, Long> {
     
     // Метод для обновления пользователя с учетом ваших полей
     @Modifying
-    @Query("UPDATE User u SET u.username = :username, u.email = :email, u.phone = :phone, u.bonusBalance = :bonusBalance, u.bonusPoints = :bonusPoints, u.userGroup = :userGroup WHERE u.id = :id")
+    @Query("UPDATE UserDto u SET u.username = :username, u.email = :email, u.phone = :phone, u.bonusBalance = :bonusBalance, u.bonusPoints = :bonusPoints, u.userGroup = :userGroup WHERE u.id = :id")
     void updateUser(
         @Param("id") Long id,
         @Param("username") String username,

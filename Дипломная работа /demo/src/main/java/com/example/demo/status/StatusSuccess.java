@@ -1,7 +1,9 @@
 package com.example.demo.status;
 
-import com.example.demo.dto.CreateUserStatusDto;
+import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.CreateUserStatusDto;
+@Service
 public class StatusSuccess {
    public CreateUserStatusDto setSucess(String message,Boolean status, CreateUserStatusDto request ){
     CreateUserStatusDto response = new CreateUserStatusDto(); 

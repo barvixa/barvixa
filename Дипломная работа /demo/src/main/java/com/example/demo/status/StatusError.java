@@ -1,7 +1,10 @@
 package com.example.demo.status;
 
+import org.springframework.stereotype.Service;
+
 import com.example.demo.dto.CreateUserStatusDto;
 
+@Service
 public class StatusError {
     public CreateUserStatusDto setError(String message,Boolean status, CreateUserStatusDto request ){
     CreateUserStatusDto response = new CreateUserStatusDto(); 

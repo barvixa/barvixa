@@ -2,30 +2,36 @@ package com.example.demo.service;
 
 import com.example.demo.dto.CreateUserStatusDto;
 import com.example.demo.dto.UserDto;
-import com.example.demo.repository.UsersRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.status.StatusError;
 import com.example.demo.status.StatusSuccess;
 
-import lombok.AllArgsConstructor;
+
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@NoArgsConstructor
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-    
-    private UsersRepository usersRepository;
+    @Autowired
+    private UserRepository usersRepository;
+    @Autowired
     private UserValidateService userValidateService;
+    @Autowired
     private UserCreateFromRequestService userCreateFromRequestService;
+    @Autowired
     private StatusSuccess statusSuccess;
+    @Autowired
     private StatusError statusError;
 
     @Transactional(noRollbackFor = {RuntimeException.class})
