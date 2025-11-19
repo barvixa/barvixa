@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px 30px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+            outline: none;
+        }
+        
+        .input-group .error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-group .success {
+            color: #2ecc71;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .password-strength {
+            height: 4px;
+            background-color: #eee;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        
+        .terms-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        
+        .terms-group input {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .terms-group label {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+        
+        .terms-group a {
+            color: #6a11cb;
+            text-decoration: none;
+        }
+        
+        .terms-group a:hover {
+            text-decoration: underline;
+        }
+        
+        .register-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .register-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .register-button:active {
+            transform: translateY(0);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #6a11cb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        /* Стили для страницы успешной регистрации */
+        .success-page {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            color: #2ecc71;
+            margin-bottom: 20px;
+        }
+        
+        .success-page h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .success-page p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .continue-button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .continue-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Форма регистрации -->
+        <div id="registrationForm">
+            <div class="form-header">
+                <h1>Создать аккаунт</h1>
+                <p>Заполните форму ниже для регистрации</p>
+            </div>
+            
+            <form id="registerForm">
+                <div class="input-group">
+                    <label for="fullName">Полное имя</label>
+                    <input type="text" id="fullName" placeholder="Введите ваше полное имя">
+                    <div class="error" id="fullNameError">Пожалуйста, введите ваше полное имя</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Введите ваш email">
+                    <div class="error" id="emailError">Пожалуйста, введите корректный email</div>
+                    <div class="success" id="emailSuccess">Email доступен для регистрации</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" placeholder="Придумайте имя пользователя">
+                    <div class="error" id="usernameError">Пожалуйста, введите имя пользователя</div>
+                    <div class="success" id="usernameSuccess">Имя пользователя доступно</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Создайте надежный пароль">
+                    <button type="button" class="password-toggle" id="togglePassword">👁️</button>
+                    <div class="error" id="passwordError">Пароль должен содержать не менее 8 символов</div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirmPassword">Подтверждение пароля</label>
+                    <input type="password" id="confirmPassword" placeholder="Повторите ваш пароль">
+                    <button type="button" class="password-toggle" id="toggleConfirmPassword">👁️</button>
+                    <div class="error" id="confirmPasswordError">Пароли не совпадают</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="birthDate">Дата рождения</label>
+                    <input type="date" id="birthDate">
+                    <div class="error" id="birthDateError">Пожалуйста, укажите вашу дату рождения</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="country">Страна</label>
+                    <select id="country">
+                        <option value="">Выберите страну</option>
+                        <option value="ru">Россия</option>
+                        <option value="by">Беларусь</option>
+                        <option value="kz">Казахстан</option>
+                        <option value="ua">Украина</option>
+                        <option value="other">Другая</option>
+                    </select>
+                    <div class="error" id="countryError">Пожалуйста, выберите страну</div>
+                </div>
+                
+                <div class="terms-group">
+                    <input type="checkbox" id="terms">
+                    <label for="terms">Я соглашаюсь с <a href="#">Условиями использования</a> и <a href="#">Политикой конфиденциальности</a></label>
+                </div>
+                <div class="error" id="termsError">Необходимо принять условия использования</div>
+                
+                <button type="submit" class="register-button">Зарегистрироваться</button>
+            </form>
+            
+            <div class="login-link">
+                Уже есть аккаунт? <a href="#" id="loginLink">Войти</a>
+            </div>
+        </div>
+        
+        <!-- Страница успешной регистрации -->
+        <div class="success-page" id="successPage">
+            <div class="success-icon">✓</div>
+            <h2>Регистрация завершена!</h2>
+            <p>Ваш аккаунт был успешно создан. Теперь вы можете войти в систему, используя свои учетные данные.</p>
+            <button class="continue-button" id="continueButton">Перейти к авторизации</button>
+        </div>
+    </div>
+
+    <script>
+        // Элементы формы регистрации
+        const registrationForm = document.getElementById('registrationForm');
+        const registerForm = document.getElementById('registerForm');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const birthDateInput = document.getElementById('birthDate');
+        const countrySelect = document.getElementById('country');
+        const termsCheckbox = document.getElementById('terms');
+        const loginLink = document.getElementById('loginLink');
+        
+        // Элементы ошибок
+        const fullNameError = document.getElementById('fullNameError');
+        const emailError = document.getElementById('emailError');
+        const emailSuccess = document.getElementById('emailSuccess');
+        const usernameError = document.getElementById('usernameError');
+        const usernameSuccess = document.getElementById('usernameSuccess');
+        const passwordError = document.getElementById('passwordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+        const birthDateError = document.getElementById('birthDateError');
+        const countryError = document.getElementById('countryError');
+        const termsError = document.getElementById('termsError');
+        
+        // Элементы переключения видимости пароля
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        
+        // Элемент индикатора силы пароля
+        const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+        
+        // Элементы страницы успеха
+        const successPage = document.getElementById('successPage');
+        const continueButton = document.getElementById('continueButton');
+        
+        // Проверка email на уникальность (заглушка)
+        function checkEmailAvailability(email) {
+            // В реальном приложении здесь был бы AJAX-запрос к серверу
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Для демонстрации считаем, что email доступен, если он содержит "@"
+                    resolve(email.includes('@'));
+                }, 500);
+            });
+        }
+        
+        // Проверка имени пользователя на уникальность (заглушка)
+        function checkUsernameAvailability(username) {
+            // В реальном приложении здесь был бы AJAX-запрос к серверу
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Для демонстрации считаем, что имя пользователя доступно, если оно длиннее 3 символов
+                    resolve(username.length > 3);
+                }, 500);
+            });
+        }
+        
+        // Проверка силы пароля
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 25;
+            if (/[a-z]/.test(password)) strength += 25;
+            if (/[A-Z]/.test(password)) strength += 25;
+            if (/[0-9]/.test(password)) strength += 25;
+            
+            return strength;
+        }
+        
+        // Обновление индикатора силы пароля
+        function updatePasswordStrength(password) {
+            const strength = checkPasswordStrength(password);
+            passwordStrengthBar.style.width = `${strength}%`;
+            
+            if (strength < 50) {
+                passwordStrengthBar.style.backgroundColor = '#e74c3c';
+            } else if (strength < 75) {
+                passwordStrengthBar.style.backgroundColor = '#f39c12';
+            } else {
+                passwordStrengthBar.style.backgroundColor = '#2ecc71';
+            }
+        }
+        
+        // Валидация формы
+        function validateForm() {
+            let isValid = true;
+            
+            // Валидация полного имени
+            if (fullNameInput.value.trim() === '') {
+                fullNameError.style.display = 'block';
+                isValid = false;
+            } else {
+                fullNameError.style.display = 'none';
+            }
+            
+            // Валидация email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value)) {
+                emailError.style.display = 'block';
+                emailSuccess.style.display = 'none';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+            }
+            
+            // Валидация имени пользователя
+            if (usernameInput.value.trim() === '') {
+                usernameError.style.display = 'block';
+                usernameSuccess.style.display = 'none';
+                isValid = false;
+            } else {
+                usernameError.style.display = 'none';
+            }
+            
+            // Валидация пароля
+            if (passwordInput.value.length < 8) {
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+            
+            // Валидация подтверждения пароля
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordError.style.display = 'block';
+                isValid = false;
+            } else {
+                confirmPasswordError.style.display = 'none';
+            }
+            
+            // Валидация даты рождения
+            if (birthDateInput.value === '') {
+                birthDateError.style.display = 'block';
+                isValid = false;
+            } else {
+                birthDateError.style.display = 'none';
+            }
+            
+            // Валидация страны
+            if (countrySelect.value === '') {
+                countryError.style.display = 'block';
+                isValid = false;
+            } else {
+                countryError.style.display = 'none';
+            }
+            
+            // Валидация согласия с условиями
+            if (!termsCheckbox.checked) {
+                termsError.style.display = 'block';
+                isValid = false;
+            } else {
+                termsError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        // Обработчик отправки формы регистрации
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (validateForm()) {
+                // В реальном приложении здесь была бы отправка данных на сервер
+                
+                // Показываем страницу успеха
+                registrationForm.style.display = 'none';
+                successPage.style.display = 'block';
+                
+                // Сохраняем данные пользователя (в реальном приложении это делал бы сервер)
+                const userData = {
+                    fullName: fullNameInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    username: usernameInput.value.trim(),
+                    password: passwordInput.value,
+                    birthDate: birthDateInput.value,
+                    country: countrySelect.value
+                };
+                
+                localStorage.setItem('userData', JSON.stringify(userData));
+            }
+        });
+        
+        // Обработчики проверки email и имени пользователя
+        emailInput.addEventListener('blur', async function() {
+            if (this.value.trim() !== '') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (emailRegex.test(this.value)) {
+                    const isAvailable = await checkEmailAvailability(this.value);
+                    if (isAvailable) {
+                        emailSuccess.style.display = 'block';
+                        emailError.style.display = 'none';
+                    } else {
+                        emailSuccess.style.display = 'none';
+                        emailError.textContent = 'Этот email уже используется';
+                        emailError.style.display = 'block';
+                    }
+                }
+            }
+        });
+        
+        usernameInput.addEventListener('blur', async function() {
+            if (this.value.trim() !== '') {
+                const isAvailable = await checkUsernameAvailability(this.value);
+                if (isAvailable) {
+                    usernameSuccess.style.display = 'block';
+                    usernameError.style.display = 'none';
+                } else {
+                    usernameSuccess.style.display = 'none';
+                    usernameError.textContent = 'Это имя пользователя уже занято';
+                    usernameError.style.display = 'block';
+                }
+            }
+        });
+        
+        // Обработчик изменения пароля
+        passwordInput.addEventListener('input', function() {
+            updatePasswordStrength(this.value);
+        });
+        
+        // Переключение видимости пароля
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+        
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+        
+        // Переход к авторизации
+        loginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // В реальном приложении здесь был бы переход на страницу авторизации
+            alert('Переход на страницу авторизации');
+        });
+        
+        continueButton.addEventListener('click', function() {
+            // В реальном приложении здесь был бы переход на страницу авторизации
+            alert('Переход на страницу авторизации');
+        });
+        
+        // Установка максимальной даты рождения (18 лет назад)
+        window.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const minDate = new Date();
+            minDate.setFullYear(today.getFullYear() - 100); // Минимум 100 лет назад
+            const maxDate = new Date();
+            maxDate.setFullYear(today.getFullYear() - 13); // Максимум 13 лет назад (минимальный возраст)
+            
+            birthDateInput.min = minDate.toISOString().split('T')[0];
+            birthDateInput.max = maxDate.toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
