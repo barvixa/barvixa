@@ -300,7 +300,7 @@
             </form>
             
             <div class="login-link">
-                Уже есть аккаунт? <a href="#" id="loginLink">Войти</a>
+                Уже есть аккаунт? <a href="Auth.html" id="loginLink">Войти</a>
             </div>
         </div>
         
@@ -309,7 +309,7 @@
             <div class="success-icon">✓</div>
             <h2>Регистрация завершена!</h2>
             <p>Ваш аккаунт был успешно создан. Теперь вы можете войти в систему, используя свои учетные данные.</p>
-            <button class="continue-button" id="continueButton">Перейти к авторизации</button>
+            <a href="Auth.html" class="continue-button" id="continueButton">Перейти к авторизации</a>
         </div>
     </div>
 
@@ -545,18 +545,6 @@
             const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             confirmPasswordInput.setAttribute('type', type);
             this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
-        
-        // Переход к авторизации
-        loginLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            // В реальном приложении здесь был бы переход на страницу авторизации
-            alert('Переход на страницу авторизации');
-        });
-        
-        continueButton.addEventListener('click', function() {
-            // В реальном приложении здесь был бы переход на страницу авторизации
-            alert('Переход на страницу авторизации');
         });
         
         // Установка максимальной даты рождения (18 лет назад)

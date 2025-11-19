@@ -337,7 +337,7 @@
         </form>
         
         <div class="register-link">
-            Нет аккаунта? <a href="#">Зарегистрироваться</a>
+            Нет аккаунта? <a href="Register.html">Зарегистрироваться</a>
         </div>
 
         <!-- Ссылка на главную страницу -->
@@ -389,8 +389,99 @@
             </div>
         </div>
 
-        <!-- Ссылка на страницу авторизации -->
-        <a href="index.html" class="home-link">Перейти к странице авторизации</a>
+        <!-- Ссылка на страницу регистрации -->
+        <a href="Register.html" class="home-link">Перейти к странице регистрации</a>
     </div>
+
+    <script>
+        // Элементы страницы авторизации
+        const loginPage = document.getElementById('loginPage');
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const usernameError = document.getElementById('usernameError');
+        const passwordError = document.getElementById('passwordError');
+        const togglePassword = document.getElementById('togglePassword');
+        
+        // Элементы основной страницы
+        const mainPage = document.getElementById('mainPage');
+        const userNameElement = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Обработчик отправки формы авторизации
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            let isValid = true;
+            
+            // Валидация имени пользователя
+            if (username === '') {
+                usernameError.style.display = 'block';
+                isValid = false;
+            } else {
+                usernameError.style.display = 'none';
+            }
+            
+            // Валидация пароля
+            if (password === '') {
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+            
+            if (isValid) {
+                // Сохраняем имя пользователя
+                localStorage.setItem('username', username);
+                
+                // Показываем основную страницу и скрываем страницу авторизации
+                loginPage.style.display = 'none';
+                mainPage.style.display = 'block';
+                
+                // Устанавливаем имя пользователя на основной странице
+                userNameElement.textContent = username;
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+            }
+        });
+        
+        // Переключение видимости пароля
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Изменение иконки
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+        
+        // Обработчик выхода из системы
+        logoutBtn.addEventListener('click', function() {
+            // Показываем страницу авторизации и скрываем основную страницу
+            loginPage.style.display = 'block';
+            mainPage.style.display = 'none';
+            
+            // Очищаем поля формы
+            usernameInput.value = '';
+            passwordInput.value = '';
+            
+            // Сбрасываем видимость пароля
+            passwordInput.setAttribute('type', 'password');
+            togglePassword.textContent = '👁️';
+        });
+        
+        // Проверяем, авторизован ли пользователь при загрузке страницы
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                // Если пользователь уже авторизован, показываем основную страницу
+                loginPage.style.display = 'none';
+                mainPage.style.display = 'block';
+                userNameElement.textContent = savedUsername;
+                userAvatar.textContent = savedUsername.charAt(0).toUpperCase();
+            }
+        });
+    </script>
 </body>
 </html>
